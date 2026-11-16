@@ -11,7 +11,7 @@ struct ScreenUnlockSection: View {
 
     var body: some View {
         Section {
-            Toggle(isOn: Binding(get: { enabled }, set: toggle)) {
+            Toggle(isOn: Binding(get: { enabled }, set: { isOn in toggle(isOn) })) {
                 Text("Déverrouiller l’écran avec mon visage")
                 Text("NOYA Face tape votre mot de passe macOS à votre place quand votre visage est reconnu. Désactivé par défaut.")
             }
@@ -179,7 +179,7 @@ struct UnlockSetupView: View {
             SecureField("Mot de passe", text: $password)
                 .textFieldStyle(.roundedBorder)
                 .disabled(verifying)
-                .onSubmit(save)
+                .onSubmit { save() }
             if let error {
                 Text(error)
                     .foregroundStyle(.red)
@@ -189,7 +189,7 @@ struct UnlockSetupView: View {
                 Spacer()
                 Button("Annuler") { onFinish(false) }
                     .keyboardShortcut(.cancelAction)
-                Button("Enregistrer", action: save)
+                Button("Enregistrer") { save() }
                     .buttonStyle(.borderedProminent)
                     .keyboardShortcut(.defaultAction)
                     .disabled(password.isEmpty || verifying)
