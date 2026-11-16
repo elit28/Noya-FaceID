@@ -36,7 +36,13 @@
 | Structure | Swift Package, 3 modules : `HeyMacCore` (reconnaissance, crypto), `HeyMacEngine` (moteur), `HeyMacApp` (UI) | Projet Xcode, une seule cible, 1 dossier plat | Projet Xcode, une cible ; `ContentView.swift` 1 250 lignes, `AppController.swift` 822 lignes |
 | Volume Swift (sources) | ~7 300 lignes | ~14 100 lignes | ~4 000 lignes |
 | macOS minimum (README) | 14 | 15 | 14 |
-| Tests automatisés | **~110 tests** (Core, Engine, App), images de référence sous Apache-2.0 | **0** test unitaire (un auto-test en ligne de commande `tools/liveness_selftest.swift`) | Pas de cible de test |
+| Tests automatisés | **110 tests** Swift Testing (Core 42, Engine 48, App 20), logique pure + chargement des modèles ; rien sur les taux de fausse acceptation | **0** test unitaire (2 scripts manuels, dont `tools/liveness_selftest.swift`) | **0** |
+| CI | Aucune | Aucune | Aucune |
+| Langage / concurrence | `swift-tools-version:6.0`, mais mode Swift 6 sur Core seulement ; Engine et App en `.v5` (`Package.swift:24-50`), 13 classes `@unchecked Sendable` | Swift 5 + isolation `MainActor` par défaut | Swift 5 + `MainActor` ; cible macOS 26.5 alors que le README annonce 14 |
+| Signature | Identité auto-signée ou ad hoc, **sans Hardened Runtime**, non notarisée (`scripts/lib-signing.sh:16-30`) | Équipe Apple, Hardened Runtime, entitlements caméra + trousseau ; notarisation non vérifiable | Ad hoc, Hardened Runtime, entitlements vides |
+| Contournement Gatekeeper demandé | « Ouvrir quand même » | Aucun | `xattr -dr com.apple.quarantine` |
+| Mise à jour automatique | Sparkle 2.10.0 (EdDSA, appcast GitHub) | Sparkle 2.9.6 (EdDSA, site propre) | Aucune |
+| Démarrage / arrière-plan | Login item + LaunchAgent `KeepAlive` ; scrutation 250 ms permanente | Login item ; événementiel | Ajout manuel aux éléments d'ouverture ; événementiel |
 | Détection de visage | Vision `VNDetectFaceLandmarksRequest` | Vision rectangles + landmarks + qualité de capture | Vision |
 | Modèle d'identité | ArcFace `w600k_mbf` (MobileFaceNet, 6,8 Mo) — **mêmes poids que Glance** (SHA-256 identique) | ArcFace `w600k_mbf` (6,8 Mo), repli `VNGenerateImageFeaturePrint` | ArcFace `w600k_r50` (ResNet50, 87 Mo) |
 | Licence des poids | InsightFace : non commercial | InsightFace : non commercial | InsightFace : non commercial (déclaré dans le README) |
@@ -55,7 +61,7 @@
 | Localisation | Fondation en place (anglais) | Chaînes en dur (anglais) | Chaînes en dur (anglais) |
 | Anti-débogage | Non | Non | `ptrace(PT_DENY_ATTACH)` via `dlsym` |
 
-Les sections *Build, signature et distribution* et *Interface* sont complétées en §7 et §8.
+Détails : build et distribution au §7, interface et protection d'applications au §8.
 
 ---
 
@@ -157,12 +163,16 @@ Conséquences :
 | 6 | Élevée | Glance | Clé de session en mémoire jusqu'à 30 jours par défaut | `GlanceSettings.swift:340-342` | Défaut 24 h, maximum 7 jours, réarmement après redémarrage et après N échecs |
 | 7 | Élevée | Tous | Aucun refus quand plusieurs visages sont présents | voir §3.1 | Refus si un second visage significatif est détecté |
 | 8 | Élevée | Tous | Vidéo rejouée non bloquée | voir §3.2 | Avertissement explicite + mode « déverrouillage de l'écran » désactivé par défaut |
-| 9 | Moyenne | HeyMac, Glance | API privées SkyLight pour l'affichage sur l'écran verrouillé | §2.4 | Module isolé, optionnel, dégradation propre si indisponible (décision à valider) |
-| 10 | Moyenne | FaceUnlock | `PT_DENY_ATTACH` via `dlsym` ; README demandant `xattr -dr com.apple.quarantine` (contournement de Gatekeeper) | `AppController.swift:252-260` ; README | Aucun anti-débogage ; aucune instruction de contournement |
-| 11 | Moyenne | HeyMac | Boucle de scrutation permanente toutes les 250 ms + `dlopen` à chaque tour | `LockScreenUnlocker.swift:105-109` ; `LockStateMonitor.swift:16-19` | Détection par événements (modèle Glance) + vérification ponctuelle |
-| 12 | Moyenne | Glance | Repli silencieux vers un extracteur générique moins discriminant | `FaceRecognitionPipeline.swift:44-52` | Échec explicite, diagnostic |
-| 13 | Moyenne | Glance, FaceUnlock | Pas de tests ; classes géantes (FaceUnlock) | §1 | Tests unitaires obligatoires par module |
-| 14 | Faible | Glance | Fichier chiffré écrit avec le masque de permissions par défaut | `SecureFaceStore.swift:48` | Écriture `0600` atomique (modèle HeyMac) |
+| 9 | Élevée | HeyMac | Application signée **sans Hardened Runtime**. [Déduit, à vérifier] Un code malveillant de l'utilisateur pourrait lancer le binaire avec une bibliothèque injectée et hériter de son accès à la clé du trousseau et à l'Accessibilité. | `scripts/lib-signing.sh:16-30` | Hardened Runtime obligatoire, sans exception d'entitlement de type `disable-library-validation` |
+| 10 | Élevée | HeyMac | Protection d'apps : ⌘⇥ vers l'app protégée pendant l'authentification lui rend le clavier sous le flou [logique lue, effet à tester] | `AppLockController.swift:88, 221-223` | Reprise systématique du premier plan, masque opaque (§8.4) |
+| 11 | Moyenne | HeyMac, Glance | API privées SkyLight pour l'affichage sur l'écran verrouillé | §2.4 | Module isolé, optionnel, dégradation propre si indisponible (décision à valider) |
+| 12 | Moyenne | FaceUnlock | `PT_DENY_ATTACH` via `dlsym` ; README demandant `xattr -dr com.apple.quarantine` (contournement de Gatekeeper) | `AppController.swift:252-260` ; README | Aucun anti-débogage ; aucune instruction de contournement |
+| 13 | Moyenne | HeyMac | Boucle de scrutation permanente toutes les 250 ms, active même si le déverrouillage de l'écran est désactivé, + `dlopen` à chaque tour | `LockScreenUnlocker.swift:105-135` ; `LockStateMonitor.swift:16-19` | Détection par événements (modèle Glance) + vérification ponctuelle |
+| 14 | Moyenne | Glance | Repli silencieux vers un extracteur générique moins discriminant | `FaceRecognitionPipeline.swift:44-52` | Échec explicite, diagnostic |
+| 15 | Moyenne | Tous | Aucune CI ; Glance et FaceUnlock sans tests ; classes géantes (FaceUnlock) | §1 | CI GitHub Actions et tests obligatoires par module |
+| 16 | Moyenne | Glance | Minuterie à 60 Hz pendant tout le verrouillage (suivi du curseur) ; caméra en résolution maximale « quelle que soit la cadence » | `NotchWindowController.swift:139-152` ; `CameraManager.swift:143-160` | Zones de suivi natives (`NSTrackingArea`), résolution caméra bornée |
+| 17 | Faible | HeyMac | Modèles Core ML recompilés à chaque lancement | `FaceEmbedder.swift:28-29` ; `AntiSpoofClassifier.swift:283-284` | Modèles précompilés à la construction |
+| 18 | Faible | Glance | Fichier chiffré écrit avec le masque de permissions par défaut | `SecureFaceStore.swift:48` | Écriture `0600` atomique (modèle HeyMac) |
 
 ---
 
@@ -299,16 +309,173 @@ Aucun des trois projets ne le propose. Conception économe : la caméra n'est **
 
 ## 7. Build, signature et distribution
 
-*(complété à partir de l'analyse des scripts et projets — voir ci-dessous)*
+### 7.1 Constat
+
+- **HeyMac** : construit en ligne de commande (`swift build -c release`, `scripts/build-app.sh`), DMG via `hdiutil`. Signature par identité **auto-signée** créée avec `openssl` et approuvée localement (`scripts/create-signing-identity.sh:32-40`), à défaut **ad hoc** ; ni Hardened Runtime, ni entitlements, ni notarisation (`release-notes/1.0.4.md:24` : « not notarized »). Mises à jour Sparkle signées EdDSA, clé privée hors dépôt (aucune trouvée dans l'historique des 130 commits).
+- **Glance** : signature Xcode avec équipe Apple, Hardened Runtime activé, entitlements `keychain-access-groups` + caméra. Aucun script de publication ni de notarisation dans le dépôt (`RELEASING.md` ignoré par Git) : notarisation invérifiable.
+- **FaceUnlock** : ad hoc, Hardened Runtime activé, entitlements vides ; README demandant de retirer l'attribut de quarantaine — **contournement de Gatekeeper à proscrire**.
+- **Aucun des trois n'a d'intégration continue.**
+- API dépréciée commune : `NSApp.activate(ignoringOtherApps:)` (dépréciée depuis macOS 14).
+- Hygiène : HeyMac propre ; Glance suit un fichier `xcuserdata` ; FaceUnlock suit 3 `.DS_Store` et un `UserInterfaceState.xcuserstate` exposant un chemin local. Aucun secret trouvé dans les trois historiques (les `SUPublicEDKey` sont des clés publiques).
+
+### 7.2 Choix pour NOYA Face
+
+| Sujet | Décision proposée | Justification |
+|---|---|---|
+| Structure | Paquet Swift local pour les modules du cœur et du moteur (testables avec `swift test`) + projet Xcode léger pour la cible application (Info.plist, entitlements, catalogue de ressources, `.xcstrings`, signature) | HeyMac prouve l'intérêt des modules ; le projet Xcode simplifie signature, entitlements et catalogues de chaînes. La compilation de `.xcstrings` par `swift build` seul n'est pas vérifiée ici. |
+| Langage | Swift 6, **mode de langage 6 sur tous les modules**, sans `@unchecked Sendable` non justifié | Exigence du projet ; HeyMac ne l'applique qu'au module Core |
+| Durcissement | Hardened Runtime obligatoire ; entitlements minimaux : `com.apple.security.device.camera` (+ `keychain-access-groups` si compte développeur) | Indispensable à la notarisation et contre l'injection de code |
+| Modèles Core ML | Précompilés (`.mlmodelc`) à la construction ; unités de calcul explicites, choisies après mesure | Évite la compilation à chaque lancement |
+| Caméra | Résolution bornée (720p maximum), cadence plafonnée, démarrage uniquement sur événement | Consommation ; Glance prend la plus haute résolution disponible |
+| Démarrage | `SMAppService.mainApp` (élément d'ouverture officiel), **pas** de LaunchAgent `KeepAlive` par défaut | Le relancement permanent de HeyMac peut créer des boucles ; si l'app est quittée, l'état « protection inactive » doit être visible |
+| Mises à jour | Sparkle 2 (MIT), signatures EdDSA, **vérification désactivée par défaut et proposée à l'utilisateur** | Exigence « aucune activité réseau inutile » |
+| CI | GitHub Actions sur exécuteur macOS : compilation, tests, vérification des traductions, analyse de secrets | Aucun des trois n'en a |
+| Secrets de publication | Certificat Developer ID, clé API de notarisation et clé privée Sparkle **uniquement** dans les secrets chiffrés GitHub | Exigence « aucun secret publié » |
+
+### 7.3 Signature et notarisation : ce qu'impose Apple
+
+| | Avec compte Apple Developer (99 $/an) | Sans compte |
+|---|---|---|
+| Signature | Developer ID Application | Identité auto-signée (stable sur votre Mac) ou ad hoc |
+| Notarisation | Oui (`notarytool`) + agrafage | **Impossible** |
+| Premier lancement chez l'utilisateur | Normal | Blocage par Gatekeeper ; l'utilisateur doit autoriser l'app dans *Réglages Système > Confidentialité et sécurité* (aucune instruction `xattr` ne sera donnée) |
+| Autorisations Caméra / Accessibilité après mise à jour | Conservées (identité stable) | Ad hoc : redemandées à chaque version ; auto-signée : conservées seulement sur la machine qui a créé l'identité |
+| Trousseau avec protection biométrique | Possible (avec identifiant d'équipe) | Très probablement indisponible (cf. FaceUnlock `PasswordVault.swift:5-13`) — à confirmer |
+
+**Recommandation** : souscrire au programme Apple Developer avant la première publication publique. Sans lui, NOYA Face reste utilisable pour vous et pour les personnes qui compilent elles-mêmes. Mais une app de sécurité non notarisée qui demande l'Accessibilité n'est pas une distribution publique raisonnable.
+
+### 7.4 Licences et attributions à reprendre
+
+| Composant | Licence | Obligation |
+|---|---|---|
+| Code HeyMac | MIT © 2026 Harshit Maurya | Conserver l'avis de copyright et la licence (`LICENSES/HeyMac-MIT.txt`) |
+| Code Glance porté | MIT © 2026 Jonathan Zhou | Idem (`LICENSES/Glance-MIT.txt`) |
+| MiniFASNetV2 (Silent-Face-Anti-Spoofing) | Apache-2.0 (licence du dépôt ; licence des poids non précisée séparément) | Joindre le texte Apache-2.0 et l'avis (HeyMac l'a supprimé de son arbre) |
+| Images de test Silent-Face | Apache-2.0 | Avis conservé ; consentement des personnes photographiées non documenté |
+| ArcFace InsightFace (`w600k_mbf`, `w600k_r50`) | **Recherche non commerciale** ; licence des paquets `buffalo_*` sur demande depuis le 24/11/2025 | **Bloquant** — voir §0 et §10 |
+| SFace (OpenCV Zoo) — candidat | Apache-2.0 (fichiers du répertoire) ; jeu d'entraînement non indiqué | À vérifier avant adoption |
+| Sparkle | MIT (non vérifié dans ce conteneur) | Avis à joindre si adopté |
 
 ---
 
 ## 8. Interface, encoche et protection d'applications
 
-*(complété à partir de l'analyse de la couche interface — voir ci-dessous)*
+Légende : **[Lu]** constaté dans le code ; **[Déduit]** inférence à vérifier sur Mac.
+
+### 8.1 Encoche / « Dynamic Island »
+
+| | HeyMac | Glance | FaceUnlock |
+|---|---|---|---|
+| Fenêtre | `NSPanel` sans bordure, non activant, niveau `.mainMenu + 3`, `ignoresMouseEvents` (`Island/NotchOverlayController.swift:255-271`) | `NSPanel` au niveau `CGShieldingWindowLevel() + 1`, clics transmis selon la zone (`NotchOverlay/NotchWindow.swift:16-47`) | Aucune |
+| Détection de l'encoche | `safeAreaInsets.top > 0` + `auxiliaryTopLeftArea/RightArea` (`Island/NotchGeometry.swift:22-34`) — API publiques | Identique + choix de l'écran (`NotchGeometry.swift:199-226`) | — |
+| Mac sans encoche | Pastille 80×24 qui glisse du haut | Pastille type « île » | — |
+| États | fermé, recherche, succès, échec, repli | idem + intégration, mode « armé » avec survol pour relancer | — |
+| Animations | Ressorts SwiftUI + **vidéos mp4** (`ScanAnimationView.swift:63, 96-98`), respecte « Réduire les animations » | Ressorts + vidéos mp4, retour haptique | — |
+| Sur l'écran verrouillé | API privée SkyLight (`Island/LockScreenSpace.swift:37-76`) | API privée SkyLight (`NotchOverlay/NotchSkyLight.swift:93-132`) | — |
+| Coût au repos | Fenêtre retirée, boucle de pulsation seulement pendant le scan (≤ 40 s) **[Lu]** | **Minuterie à 60 Hz** pendant tout le verrouillage pour suivre le curseur (`NotchWindowController.swift:139-152`) **[Lu]** | — |
+
+Les vidéos mp4 de HeyMac ont la même empreinte que celles de Glance : HeyMac dérive en partie de Glance. **NOYA Face n'utilisera aucune de ces vidéos** et dessinera ses propres animations (SwiftUI `Canvas`/formes, durées courtes, « Réduire les animations » respecté).
+
+### 8.2 Assistant de configuration et réglages
+
+- **HeyMac** : assistant en 8 étapes (`Setup/SetupFlow.swift:80-87`), réglages en 6 panneaux **dans un seul fichier de 814 lignes** (`Settings/SettingsView.swift`), palette dupliquée `WZ` (`SetupWizardView.swift:6-25`). Tous les réglages vérifiés sont reliés à un comportement réel. Écart : « Show unlock animation » n'est pas respecté par la protection d'applications (`NotchOverlayController.swift:44` vs `AppLockController.swift:122-161`). Outil utile : rendu PNG des écrans en ligne de commande (`Debug/UISnapshot.swift`).
+- **Glance** : intégration dans l'encoche (9 étapes) pilotée par un objet unique de 1 128 lignes (`Onboarding/OnboardingController.swift`) ; réglages derrière Touch ID ; tous les réglages vérifiés sont reliés.
+- **FaceUnlock** : `TabView` de taille fixe 530×560 dans un fichier de 1 250 lignes ; `injectionDelaySeconds` sans contrôle dans l'interface.
+
+### 8.3 Localisation
+
+| | HeyMac | Glance | FaceUnlock |
+|---|---|---|---|
+| Système | `Localizable.strings` (346 entrées) + utilitaire `L10n` | Aucun (chaînes en dur, ~250) | Aucun (~137 chaînes en dur) |
+| Externalisation | ~99 % ; titres de fenêtres non traduits (`WindowPresenter.swift:30`) | 0 % | 0 % |
+| Français | Non | Non | Non |
+
+NOYA Face partira directement sur un **catalogue de chaînes `.xcstrings`** (format Apple actuel), français de France comme langue de développement, anglais en seconde langue, avec un test automatisé qui échoue si une clé n'est pas traduite.
+
+### 8.4 Protection d'applications (HeyMac uniquement)
+
+Fonctionnement **[Lu]** : surveillance `NSWorkspace` + réconciliation toutes les 2 s (`AppLock/AppWatcher.swift`) ; à l'activation d'une app protégée, un panneau flou plein écran par écran (`ShieldController.swift`, `ShieldView.swift`) ou un panneau par fenêtre suivi à 50 Hz (`AppWindowShield.swift`) ; authentification visage puis Touch ID / mot de passe vérifié par macOS ; quitter HeyMac exige une authentification et un LaunchAgent `KeepAlive` le relance.
+
+**Ce que ce bouclier n'est pas** : une barrière de sécurité. C'est un **écran de confidentialité** contre un regard indiscret ou un accès opportuniste.
+
+| Limite | Statut |
+|---|---|
+| L'app protégée continue de tourner (son, réseau, notifications) | [Lu] aucune suspension ; effets [Déduit] |
+| Flou et non masque opaque : la mise en page reste reconnaissable | [Lu] `ShieldView.swift:21-23` |
+| **⌘⇥ vers l'app protégée pendant l'authentification** : ignoré (`AppLockController.swift:88, 221-223`), rien ne reprend le premier plan ; l'app reçoit alors le clavier sous le flou (⌘A, ⌘C, ⌘Q…) | [Lu] logique ; effet [Déduit, à tester en priorité] |
+| Captures d'écran ciblées sur une fenêtre, vignettes de Mission Control | [Déduit, à tester] rien ne les bloque dans le code |
+| Mode « fenêtres » : barre des menus et Dock non couverts, interrogation à 50 Hz | [Lu] |
+| Fenêtre sur un autre écran couverte jusqu'à 2 s après | [Lu] |
+| Après arrêt forcé, rien n'est protégé jusqu'à la relance par launchd | [Déduit] |
+| Les données de l'app restent lisibles sur disque par d'autres moyens | Limite intrinsèque de macOS |
+
+Corrections prévues : masque **opaque** par défaut (flou en option), reprise systématique du premier plan à chaque activation de l'app protégée pendant un épisode, masquage (`hide`) immédiat de l'app protégée, mode plein écran uniquement (le suivi à 50 Hz est abandonné), message explicite dans l'interface : « Protection de confidentialité — ne remplace pas le chiffrement ni un compte utilisateur séparé ».
+
+### 8.5 Composants d'interface
+
+- **Réutilisables** : HeyMac `Island/*` (géométrie de l'encoche, forme, contrôleur — sans les vidéos ni SkyLight), `DesignSystem/Theme.swift` et `Components.swift`, `App/WindowPresenter.swift`, `Debug/UISnapshot.swift` ; Glance `Settings/SettingsControls.swift` (`HoldToConfirmButton`, tuiles d'options), `AnimatedCheckmark.swift`, `EnrollmentRingView.swift`, logique de clics transmis par zone (sans la minuterie 60 Hz).
+- **À réécrire** : réglages HeyMac (découpage par écran), contrôleur d'intégration Glance, toute l'interface FaceUnlock.
+
+Ces composants serviront de **matière première** ; l'identité visuelle de NOYA Face sera définie dans les maquettes (phase 3) avant toute implémentation d'interface.
 
 ---
 
-## 9. Plan de développement
+## 9. Plan de développement et jalons vérifiables
 
-*(voir ci-dessous)*
+### 9.1 Contraintes de vérification
+
+- L'environnement de développement de Claude est **Linux, sans Xcode** : aucune compilation ni aucun test Swift n'y est possible.
+- Vérification automatique : **GitHub Actions sur exécuteur macOS** (compilation + tests unitaires). Les résultats sont consultables dans l'onglet *Actions* du dépôt. Pas de caméra ni d'autorisations système sur ces machines.
+- Vérification manuelle : **sur votre MacBook Air M5**, une étape à la fois, avec un protocole écrit pour chaque test de sécurité.
+- Règle : une branche par jalon, **aucune fusion dans `main` sans votre validation**.
+
+### 9.2 Jalons
+
+```mermaid
+flowchart LR
+    J0[J0 Audit] --> J1[J1 Socle + CI]
+    J1 --> J2[J2 Choix du modèle]
+    J0 --> J3[J3 Maquettes]
+    J2 --> J4[J4 Reconnaissance]
+    J4 --> J5[J5 Stockage sécurisé]
+    J4 --> J6[J6 Présence réelle]
+    J3 --> J7[J7 Protection d'apps]
+    J5 --> J7
+    J6 --> J7
+    J6 --> J8[J8 Verrouillage sur absence]
+    J5 --> J9[J9 Déverrouillage écran opt-in]
+    J6 --> J9
+    J3 --> J10[J10 Encoche]
+    J7 --> J11[J11 Localisation]
+    J9 --> J11
+    J10 --> J11
+    J11 --> J12[J12 Performances]
+    J12 --> J13[J13 Distribution]
+```
+
+| Jalon | Livrable | Critère de vérification (preuve attendue) | Vérifié par |
+|---|---|---|---|
+| **J0** Audit | Ce document | Décisions du §10 validées | Vous |
+| **J1** Socle | Import de HeyMac `a73667d` avec attribution (`LICENSES/`, `THIRD_PARTY_NOTICES.md`), modules renommés `Noya*`, mode de langage Swift 6, vidéos et SkyLight retirés, **poids ArcFace non commités**, `.xcstrings`, `SECURITY.md`, `CONTRIBUTING.md`, CI | Exécution GitHub Actions verte (lien), tests importés qui passent, `git grep` sans secret ni binaire de modèle | CI + vous |
+| **J2** Modèle | Comparaison SFace (Apache-2.0) vs ArcFace MBF sur votre Mac ; décision juridique | Rapport avec taux de faux rejets / fausses acceptations **mesurés** sur un protocole écrit (vous + volontaires consentants), licence du modèle retenu documentée | Vous |
+| **J3** Maquettes | Prototype interactif des 11 écrans + états de l'encoche, clair/sombre, en français | Votre validation écrite écran par écran | Vous |
+| **J4** Reconnaissance | Profils multiples, refus multi-visages, qualité d'image, outil de diagnostic | Tests unitaires CI ; protocole manuel (lunettes, lumière faible, contre-jour, orientation, visage partiel) avec résultats consignés | CI + vous |
+| **J5** Stockage | Trousseau avec contrôle d'accès, chiffrement, suppression complète | Tests CI ; vérification manuelle que les éléments ne sont pas lisibles sans authentification ; suppression vérifiée (fichiers et éléments du trousseau absents) | CI + vous |
+| **J6** Présence réelle | Module CNN + indices temporels, mode strict | Protocole d'attaque : photo imprimée, photo sur téléphone, vidéo sur écran, tentatives répétées, deux personnes, faible lumière — **résultats publiés tels quels**, y compris les échecs | Vous |
+| **J7** Protection d'apps | Bouclier corrigé (§8.4), liste des apps, recherche, durées de confiance | Tests ⌘⇥, captures, Mission Control, multi-écran, arrêt forcé — consignés | Vous |
+| **J8** Absence | Verrouillage sur absence, caméra seulement après inactivité | Mac verrouillé après le délai configuré ; caméra éteinte pendant la frappe (voyant) | Vous |
+| **J9** Écran verrouillé | Mode avancé opt-in durci (§6.3), vérification du mot de passe avant stockage | Veille, couvercle, écran externe, mot de passe changé, permission révoquée, redémarrage (doit refuser) | Vous |
+| **J10** Encoche | Animations propres, pastille sans encoche, décision SkyLight appliquée | Captures des 9 états, « Réduire les animations » respecté | Vous |
+| **J11** Langues | Français intégral + anglais | Test CI : aucune clé manquante ; revue visuelle en français | CI + vous |
+| **J12** Performances | Profil Instruments sur M5 : repos, scan, protection active | Fichiers `.trace` et chiffres **mesurés** ; objectifs fixés après la 1re mesure | Vous |
+| **J13** Distribution | `.app`, `.dmg`, signature, notarisation (si compte), Releases, README FR/EN | Installation sur un Mac neuf sans avertissement (si notarisé) | Vous |
+
+---
+
+## 10. Décisions à valider avant le jalon J1
+
+1. **Base** : HeyMac + portages ciblés depuis Glance (recommandé).
+2. **Modèle de reconnaissance** : ne publier aucune version avec ArcFace InsightFace sans licence écrite ; évaluer SFace (Apache-2.0) au jalon J2 (recommandé).
+3. **Compte Apple Developer (99 $/an)** : fortement recommandé pour la notarisation, la stabilité des autorisations et la protection biométrique du trousseau.
+4. **Déverrouillage de l'écran** : mode avancé désactivé par défaut, disponible uniquement si la clé du trousseau peut être protégée par Touch ID / mot de passe (recommandé).
+5. **Interface sur l'écran verrouillé via API privée SkyLight** : optionnelle et isolée (avec dégradation propre), ou refusée (aucune animation sur l'écran verrouillé).
