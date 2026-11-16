@@ -468,13 +468,15 @@ flowchart LR
 | **J10** Encoche | Animations propres, pastille sans encoche, décision SkyLight appliquée | Captures des 9 états, « Réduire les animations » respecté | Vous |
 | **J11** Langues | Français intégral + anglais | Test CI : aucune clé manquante ; revue visuelle en français | CI + vous |
 | **J12** Performances | Profil Instruments sur M5 : repos, scan, protection active | Fichiers `.trace` et chiffres **mesurés** ; objectifs fixés après la 1re mesure | Vous |
-| **J13** Distribution | `.app`, `.dmg`, signature, notarisation (si compte), Releases, README FR/EN | Installation sur un Mac neuf sans avertissement (si notarisé) | Vous |
+| **J13** Distribution | `.app`, `.dmg`, signature, notarisation, Releases, mises à jour depuis l'interface (Sparkle, signatures EdDSA), README FR/EN, **vidéo de présentation et d'utilisation enregistrée sur l'app réelle** | Installation sur un Mac neuf sans avertissement ; mise à jour d'une version à la suivante depuis l'app ; vidéo publiée | Vous |
 
 ---
 
 ## 10. Décisions à valider avant le jalon J1
 
 > **Statut : toutes les recommandations ont été validées le 16/11/2026.** Ordre retenu : maquettes (J3) d'abord, puis socle (J1). Pour le point 5, l'option retenue est l'affichage sur l'écran verrouillé **optionnel, isolé et désactivable**, avec dégradation propre.
+
+> **Retours sur les maquettes (J3), 16/11/2026** : logo « N » dans le cadre façon Face ID ; identité sobre (monochrome, l'app suit la couleur d'accentuation de macOS, pas de violet) ; île affichée **de chaque côté de l'encoche** ; enregistrement du visage en deux tours de tête comme sur iPhone ; durée de recherche du visage réglable ; mises à jour depuis l'interface ; film de présentation.
 
 1. **Base** : HeyMac + portages ciblés depuis Glance (recommandé).
 2. **Modèle de reconnaissance** : ne publier aucune version avec ArcFace InsightFace sans licence écrite ; évaluer SFace (Apache-2.0) au jalon J2 (recommandé).
