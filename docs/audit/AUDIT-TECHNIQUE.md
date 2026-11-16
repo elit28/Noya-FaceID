@@ -474,6 +474,8 @@ flowchart LR
 
 ## 10. Décisions à valider avant le jalon J1
 
+> **Statut : toutes les recommandations ont été validées le 16/11/2026.** Ordre retenu : maquettes (J3) d'abord, puis socle (J1). Pour le point 5, l'option retenue est l'affichage sur l'écran verrouillé **optionnel, isolé et désactivable**, avec dégradation propre.
+
 1. **Base** : HeyMac + portages ciblés depuis Glance (recommandé).
 2. **Modèle de reconnaissance** : ne publier aucune version avec ArcFace InsightFace sans licence écrite ; évaluer SFace (Apache-2.0) au jalon J2 (recommandé).
 3. **Compte Apple Developer (99 $/an)** : fortement recommandé pour la notarisation, la stabilité des autorisations et la protection biométrique du trousseau.
