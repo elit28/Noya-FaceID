@@ -483,3 +483,25 @@ flowchart LR
 3. **Compte Apple Developer (99 $/an)** : fortement recommandé pour la notarisation, la stabilité des autorisations et la protection biométrique du trousseau.
 4. **Déverrouillage de l'écran** : mode avancé désactivé par défaut, disponible uniquement si la clé du trousseau peut être protégée par Touch ID / mot de passe (recommandé).
 5. **Interface sur l'écran verrouillé via API privée SkyLight** : optionnelle et isolée (avec dégradation propre), ou refusée (aucune animation sur l'écran verrouillé).
+
+### 10.1 Décisions complémentaires (16/11/2026)
+
+| # | Sujet | Décision |
+|---|---|---|
+| 1 | Identifiant de l'app | `fr.noya360.noyaface` (domaine noya360.fr) |
+| 2 | macOS minimum | macOS 14 Sonoma |
+| 3 | Mac de test | Xcode pas encore installé : à installer avant le jalon J1 (gratuit, Mac App Store) |
+| 4 | Compte Apple Developer | **Non souscrit à ce jour.** Conséquences : pas de notarisation ni de distribution sans avertissement Gatekeeper ; protection biométrique du Trousseau très probablement indisponible (à confirmer sur Mac). Le mode « déverrouillage de l'écran » reste donc **indisponible** tant que cette protection n'est pas possible (décision §10 n° 4). |
+| 5 | Nom du dépôt | Renommer `Noya-FaceID` en `noya-face` (action du propriétaire, avant J1) |
+| 6 | Branche principale | Conservée : `Branche-Principale-Noya-FaceID` |
+| 7 | Modèle de reconnaissance | Pas de demande de licence à InsightFace : **SFace (OpenCV Zoo, Apache-2.0)** évalué au jalon J2 ; aucun poids ArcFace dans le dépôt |
+| 8 | Langues | Français et anglais complets en v1, puis espagnol, allemand, italien et portugais |
+| 9 | Couleur | Suit la couleur d'accentuation de macOS |
+| 10 | Visages | **Un seul visage par Mac.** Des apparences du même visage (lunettes, barbe, éclairage) peuvent être ajoutées ; chacune doit correspondre au visage déjà enregistré |
+| 11 | Mac fermé + écran externe | Bascule automatique sur Touch ID ou mot de passe si aucune caméra n'est disponible |
+| 12 | Critère anti-photo | 0 acceptation sur 50 essais photo imprimée + 50 essais photo sur téléphone |
+| 13 | Vidéo rejouée | Limite documentée ; déverrouillage de l'écran = mode avancé désactivé par défaut |
+| 14 | Performances | Processeur quasi nul au repos, caméra uniquement pendant les recherches, aucune connexion réseau sans action de l'utilisateur |
+| 15 | Homebrew | Plus tard |
+| 16 | Maquette | Ajout des écrans : choix de la caméra, mot de passe en mode avancé, sélecteur d'applications, erreurs, notifications, plusieurs écrans, désinstallation |
+| 17 | Démarrage du code | **Après validation complète des maquettes** |
