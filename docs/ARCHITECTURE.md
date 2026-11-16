@@ -2,55 +2,52 @@
 
 Document de référence de l'architecture. Les choix et leur justification figurent dans [`audit/AUDIT-TECHNIQUE.md`](audit/AUDIT-TECHNIQUE.md).
 
-## État actuel — socle (jalon J1)
+## Vue d'ensemble — version 1.0
 
 ```mermaid
-flowchart LR
-    APP["NoyaFace<br/>(app de barre des menus)<br/>Swift 6"] --> CORE["NoyaCore<br/>reconnaissance, présence réelle,<br/>stockage chiffré, état du verrouillage<br/>Swift 6"]
-    ENG["NoyaEngine<br/>caméra, enrôlement, vérification,<br/>protection d'applications<br/>Swift 6"] --> CORE
-    TESTS["Tests<br/>NoyaCoreTests, NoyaEngineTests"] -.-> CORE
-    TESTS -.-> ENG
+flowchart TB
+    subgraph APP["NoyaFace — l'app (SwiftUI + AppKit, Swift 6)"]
+        ONB["Assistant de configuration<br/>autorisations, enregistrement du visage"]
+        SET["Fenêtre principale<br/>tableau de bord, 8 pages"]
+        APL["Protection d'apps<br/>AppWatcher, bouclier par écran"]
+        AWY["Verrouillage en cas d'absence"]
+        UNL["Déverrouillage de l'écran<br/>(mode avancé)"]
+        ISL["Île de l'encoche / pastille"]
+        UPD["Mises à jour, désinstallation"]
+    end
+    subgraph ENG["NoyaEngine — logique testée (Swift 6)"]
+        CAM["Caméra à la demande"]
+        GEN["Enrôlement guidé (deux tours)"]
+        VER["Vérification bornée<br/>FaceVerifier"]
+        AUTH["Visage puis Touch ID / mot de passe<br/>LocalSystemAuth (LAContext)"]
+        SES["Sessions de confiance<br/>règles de reverrouillage"]
+        AWS["Décision d'absence<br/>AwayLockState"]
+        ARM["Armement, saisie du mot de passe<br/>UnlockArming, LockScreenUnlocker"]
+    end
+    subgraph CORE["NoyaCore — reconnaissance et stockage (Swift 6)"]
+        DET["Détection Vision + alignement 5 points"]
+        EMB["Empreinte SFace (Core ML)"]
+        LIV["Présence réelle MiniFASNetV2"]
+        PRO["Profil : un visage, plusieurs apparences"]
+        SEC["AES-256-GCM + clé dans le trousseau"]
+    end
+    ONB --> GEN
+    APL --> SES & AUTH & VER
+    AWY --> AWS & VER
+    UNL --> ARM & VER
+    SET --> ONB & APL & AWY & UNL & UPD
+    APL & AWY & UNL --> ISL
+    GEN & VER --> CAM & DET & EMB & LIV & PRO
+    PRO & ARM --> SEC
 ```
 
 | Module | Rôle | Origine |
 |---|---|---|
-| `NoyaCore` | Détection (Vision, tous les visages), alignement 5 points, empreinte SFace (Core ML), profil « un visage, plusieurs apparences », classifieur anti-usurpation MiniFASNet, stockage AES-GCM, lecture de l'état de verrouillage | HeyMac (MIT), adapté ; SFace (Apache-2.0) |
-| `NoyaEngine` | Capture caméra à la demande, enrôlement, fenêtres de vérification bornées, coordination visage → Touch ID / mot de passe, sessions de confiance des apps protégées | HeyMac (MIT), adapté |
-| `NoyaFace` | Application : icône de barre des menus (masquable), fenêtre de réglages, état réel des composants | Nouveau |
+| `NoyaCore` | Détection (Vision, tous les visages), alignement 5 points, empreinte SFace (Core ML), profil « un visage, plusieurs apparences », classifieur anti-usurpation MiniFASNetV2, stockage AES-GCM, état du verrouillage | HeyMac (MIT), adapté ; SFace (Apache-2.0) |
+| `NoyaEngine` | Caméra à la demande, enrôlement guidé, vérification bornée, visage → Touch ID / mot de passe, sessions des apps protégées, décision d'absence, armement et saisie du mot de passe, vérification du mot de passe (OpenDirectory), comparaison de versions | HeyMac (MIT), adapté et complété |
+| `NoyaFace` | L'app : barre des menus, assistant, fenêtre principale, bouclier des apps, verrouillage en cas d'absence, déverrouillage de l'écran, île de l'encoche, mises à jour, désinstallation | Nouveau ; bouclier et observateur d'apps adaptés de HeyMac |
 
-L'app n'utilise pas encore le moteur : aucune fonction de protection n'est active au jalon J1.
-
-## Cible
-
-```mermaid
-flowchart TB
-    subgraph UI["Interface (SwiftUI + AppKit)"]
-        APP["NoyaFace : barre des menus, assistant, réglages, diagnostic"]
-        ISL["Île de l'encoche / pastille"]
-        SHD["Masques des apps protégées"]
-    end
-    subgraph ENG["Moteur"]
-        POL["Règles de décision et limites de tentatives"]
-        AUTH["Visage puis Touch ID / mot de passe (LAContext)"]
-        LOCK["État verrouillé, verrouillage sur absence, déverrouillage (avancé)"]
-        APPL["Protection d'applications"]
-    end
-    subgraph CORE["Cœur testable"]
-        CAP["Caméra à la demande"]
-        REC["Reconnaissance"]
-        LIV["Présence réelle : CNN + indices temporels"]
-        PRO["Visage et apparences"]
-        SEC["Trousseau + AES-GCM"]
-    end
-    APP --> POL & AUTH & LOCK & APPL
-    ISL --> POL
-    SHD --> APPL
-    POL --> REC & LIV & PRO
-    LOCK --> SEC
-    REC --> CAP
-    LIV --> CAP
-    PRO --> SEC
-```
+Principes : API publiques uniquement (contrôle CI), caméra jamais allumée sans action ou délai d'inactivité, aucune image enregistrée, mot de passe déchiffré seulement après une reconnaissance positive.
 
 ## Construction et contrôles
 
@@ -60,7 +57,10 @@ flowchart TB
 | App | `scripts/build-app.sh` : assemblage, traductions, icône, signature ad hoc ou identité locale, Hardened Runtime |
 | Vérification de l'app | `scripts/verify-app.sh` : signature, runtime, entitlement caméra seul, identifiant, ressources, traductions, absence de modèle InsightFace |
 | Contrôles du dépôt | `scripts/check-private-api.sh`, `scripts/check-localizations.py`, `scripts/check-repository.sh` |
-| Intégration continue | `.github/workflows/ci.yml` : contrôles (Linux) puis compilation, tests et app (macOS) ; l'app de test est publiée en archive |
+| Image disque | `scripts/build-dmg.sh` : fenêtre d'installation à la marque (dmgbuild, sans AppleScript), vérifiée par `hdiutil verify` |
+| Intégration continue | `.github/workflows/ci.yml` : contrôles (Linux) puis compilation, tests, app et DMG (macOS) ; l'app de test est publiée en archive |
+| Publication | `.github/workflows/release.yml` (lancement manuel) : mêmes étapes, puis version GitHub avec DMG, ZIP et empreintes SHA-256 |
+| Visuels | `scripts/generate-app-icon.py` (icône), `scripts/generate-dmg-background.py` (installateur), `scripts/make-presentation-video.py` (vidéo) |
 
 ## Localisation
 

@@ -1,5 +1,7 @@
 # Vidéo de présentation et d'utilisation — script
 
+Une **présentation de 30 s** est déjà disponible : [`docs/video/noya-face-presentation.mp4`](video/noya-face-presentation.mp4). Elle est montée par `scripts/make-presentation-video.py` à partir de visuels réels : l'icône, l'installateur et une capture de l'app. Ce script décrit la **démonstration filmée** à tourner sur un Mac avec l'app réelle.
+
 Durée visée : **75 secondes**. Format : 1920 × 1080 (16:9), 30 images/s, plus une coupe 1080 × 1920 pour les réseaux.
 Enregistrement : sur le vrai Mac, avec l'app réelle (jamais de maquette ni d'image générée présentée comme l'app).
 

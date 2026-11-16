@@ -1,0 +1,45 @@
+name: Problème — Bug
+description: Quelque chose ne fonctionne pas comme prévu. Something doesn't work as expected.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Merci ! Une faille de sécurité se signale en privé (onglet Security), pas ici.
+        Thanks! Security issues must be reported privately (Security tab), not here.
+  - type: input
+    id: version
+    attributes:
+      label: Version de NOYA Face
+      description: Réglages › À propos.
+      placeholder: "1.0.1"
+    validations:
+      required: true
+  - type: input
+    id: macos
+    attributes:
+      label: macOS et Mac
+      placeholder: "macOS 15.1, MacBook Air M2 (avec encoche)"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Étapes pour reproduire
+      placeholder: |
+        1. …
+        2. …
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Résultat attendu et résultat obtenu
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Extrait du journal (facultatif)
+      description: Réglages › Paramètres avancés › Journal › Afficher dans le Finder. Il ne contient ni image, ni empreinte, ni mot de passe.
+      render: text
