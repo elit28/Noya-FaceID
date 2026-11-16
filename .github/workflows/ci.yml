@@ -24,7 +24,10 @@ jobs:
 
   macos:
     name: Compilation, tests et app (macOS)
-    runs-on: macos-15
+    # Machines Intel : les machines macOS Apple Silicon gratuites de GitHub sont saturées
+    # (« capacity constraints ») et abandonnent la tâche après ~15 min d'attente.
+    # L'app est construite en universel (Apple Silicon + Intel).
+    runs-on: macos-15-intel
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
@@ -37,7 +40,9 @@ jobs:
         run: swift build
       - name: Tests
         run: swift test
-      - name: Construction de l’app (signature ad hoc, Hardened Runtime)
+      - name: Construction de l’app universelle (signature ad hoc, Hardened Runtime)
+        env:
+          NOYA_UNIVERSAL: "1"
         run: scripts/build-app.sh "0.1.0" "${{ github.run_number }}"
       - name: Archive de l’app
         run: ditto -c -k --keepParent "dist/NOYA Face.app" "dist/NOYA-Face-dev.zip"

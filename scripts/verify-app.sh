@@ -22,4 +22,5 @@ done
 if find "$APP" -iname "*arcface*" -o -iname "*w600k*" -o -iname "*buffalo*" | grep -q .; then
     fail "modèle InsightFace détecté (licence non commerciale)"
 fi
+echo "Architectures : $(lipo -archs "$APP/Contents/MacOS/NoyaFace")"
 echo "Vérification réussie : $APP"

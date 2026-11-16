@@ -86,6 +86,17 @@ public final class VerificationPipeline {
         return (try embedder.embedding(for: face, in: frame), liveness)
     }
 
+    /// Échantillon d'enrôlement guidé : comme `enrollmentSample`, avec l'orientation de la tête.
+    public func guidedSample(from image: CGImage) throws -> GuidedSample {
+        let (face, frame) = try detect(in: image)
+        let liveness = try classifier.liveness(for: face, in: frame)
+        guard isLive(liveness) else { throw VerificationPipelineError.notLive(confidence: liveness.confidence) }
+        return GuidedSample(
+            embedding: try embedder.embedding(for: face, in: frame), liveness: liveness,
+            pose: FacePose.estimate(from: face.landmarks)
+        )
+    }
+
     // MARK: - Profil
 
     /// Premier enrôlement (ou réenregistrement complet) : remplace le profil par une seule

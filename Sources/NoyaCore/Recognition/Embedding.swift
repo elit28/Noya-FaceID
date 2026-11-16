@@ -1,6 +1,6 @@
 import Foundation
 
-public struct FaceEmbedding: Equatable {
+public struct FaceEmbedding: Equatable, Sendable {
     public let vector: [Float]
     public init(vector: [Float]) {
         self.vector = vector

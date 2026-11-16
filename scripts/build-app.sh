@@ -3,6 +3,7 @@
 # Usage : scripts/build-app.sh [version] [numéro de build]
 #   version          ex. 0.1.0 (CFBundleShortVersionString)
 #   numéro de build  entier croissant (CFBundleVersion), 1 par défaut
+# NOYA_UNIVERSAL=1 : binaire universel (Apple Silicon + Intel) ; sinon, architecture du Mac.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -14,9 +15,13 @@ DIST="$REPO_ROOT/dist"
 APP="$DIST/NOYA Face.app"
 source "$SCRIPT_DIR/lib-signing.sh"
 
-echo "Compilation (release)…"
-(cd "$REPO_ROOT" && swift build -c release --product NoyaFace)
-BIN="$(cd "$REPO_ROOT" && swift build -c release --show-bin-path)"
+ARCH_FLAGS=()
+if [ "${NOYA_UNIVERSAL:-0}" = "1" ]; then
+    ARCH_FLAGS=(--arch arm64 --arch x86_64)
+fi
+if [ "${NOYA_UNIVERSAL:-0}" = "1" ]; then echo "Compilation (release, universelle)…"; else echo "Compilation (release)…"; fi
+(cd "$REPO_ROOT" && swift build -c release --product NoyaFace ${ARCH_FLAGS[@]+"${ARCH_FLAGS[@]}"})
+BIN="$(cd "$REPO_ROOT" && swift build -c release --show-bin-path ${ARCH_FLAGS[@]+"${ARCH_FLAGS[@]}"})"
 
 echo "Assemblage de $APP…"
 mkdir -p "$DIST" && touch "$DIST/.metadata_never_index"  # évite que Spotlight indexe cette copie
