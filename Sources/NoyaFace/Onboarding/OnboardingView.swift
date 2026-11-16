@@ -19,7 +19,12 @@ struct OnboardingView: View {
     }
 
     let onFinish: () -> Void
-    @State private var step: Step = .welcome
+    @State private var step: Step
+
+    init(startStep: Step = .welcome, onFinish: @escaping () -> Void) {
+        self.onFinish = onFinish
+        _step = State(initialValue: startStep)
+    }
     @State private var permissions = PermissionsModel()
     @State private var enrollment = EnrollmentModel()
     @AppStorage(FeatureKeys.appProtection) private var appProtection = true

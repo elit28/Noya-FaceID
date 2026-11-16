@@ -78,7 +78,10 @@ final class ScreenUnlockController {
         switch event {
         case .lockScreenUnlocked:
             arming.recordUnlock()
+            IslandController.shared.flash(.unlocking, seconds: 1.6)
+            ActivityLog.shared.record(.success, "Écran déverrouillé par reconnaissance faciale")
         case .lockScreenNoMatch:
+            ActivityLog.shared.record(.refused, "Visage inconnu sur l’écran verrouillé")
             if arming.recordRejectedFace() {
                 disarmedAfterRejections = true
                 updateArmedUntil()

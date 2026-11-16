@@ -46,10 +46,16 @@ final class AwayLockController {
                     // Plafonné pour suivre un changement de réglage sans attendre.
                     pause = min(max(seconds, 1), 30)
                 case .check:
+                    IslandController.shared.show(.searching)
                     let presence = await checkPresence()
+                    IslandController.shared.hide()
                     state.record(presence, idle: idle)
                     pause = 1
                 case .lock:
+                    IslandController.shared.flash(.locking)
+                    ActivityLog.shared.record(.locked, "Mac verrouillé après une absence")
+                    // Laisse voir « Verrouillé » un instant avant le raccourci système.
+                    try? await Task.sleep(nanoseconds: 700_000_000)
                     lockScreen()
                     state.reset()
                     pause = 10

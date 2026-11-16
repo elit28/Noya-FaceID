@@ -21,9 +21,10 @@ final class SettingsWindowController {
     private func makeWindow() -> NSWindow {
         let hosting = NSHostingController(rootView: SettingsView())
         let window = NSWindow(contentViewController: hosting)
-        window.title = String(localized: "Réglages de NOYA Face")
+        window.title = AppInfo.name
         window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
-        window.setContentSize(NSSize(width: 560, height: 640))
+        window.setContentSize(NSSize(width: 900, height: 680))
+        window.contentMinSize = NSSize(width: 820, height: 600)
         window.isReleasedWhenClosed = false
         window.center()
         return window

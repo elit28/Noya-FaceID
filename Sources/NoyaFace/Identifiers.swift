@@ -17,6 +17,8 @@ enum PreferenceKeys {
 enum AppInfo {
     /// Nom de marque, identique dans toutes les langues.
     static let name = "NOYA Face"
+    static let websiteURL = "https://noya360.fr"
+    static let repositoryURL = "https://github.com/elit28/Noya-FaceID"
 
     static var version: String {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.0.0"
@@ -66,6 +68,24 @@ enum AwayLockKeys {
 enum ScreenUnlockKeys {
     /// Durée d'armement de la saisie automatique, en heures.
     static let armHours = "screenUnlock.armHours"
+}
+
+/// Préférences de l'île de l'encoche.
+enum IslandKeys {
+    static let enabled = "island.enabled"
+    /// Style : `IslandStyle`.
+    static let style = "island.style"
+
+    static var isEnabled: Bool {
+        UserDefaults.standard.object(forKey: enabled) as? Bool ?? true
+    }
+}
+
+/// « Côtés » (par défaut) : icône à gauche de l'encoche, message à droite. « Discret » :
+/// icône seule, plus étroit.
+enum IslandStyle: String, CaseIterable {
+    case sides
+    case discreet
 }
 
 /// Aspect du bouclier. Opaque par défaut : rien de l'app n'est visible.

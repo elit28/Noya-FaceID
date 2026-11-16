@@ -129,6 +129,7 @@ struct EnrollmentStep: View {
             case .cameraBusy: return "La caméra est occupée par une autre vérification. Réessayez."
             case .timedOut: return "Le cercle n’a pas été complété à temps. Réessayez en tournant lentement la tête."
             case .saveFailed: return "L’enregistrement a échoué. Réessayez."
+            case .differentPerson: return "Cette apparence ne correspond pas à votre visage enregistré."
             }
         }
     }

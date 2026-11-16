@@ -23,6 +23,8 @@ final class EnrollmentModel {
         case cameraBusy
         case timedOut
         case saveFailed
+        /// Ajout d'apparence : le visage ne correspond pas à celui déjà enregistré.
+        case differentPerson
     }
 
     static let sectorCount = 12
@@ -34,6 +36,8 @@ final class EnrollmentModel {
     private(set) var calibrating = false
     /// Option d'accessibilité : un demi-cercle suffit, avec des mouvements de tête plus petits.
     private(set) var partialCircle = false
+    /// Renseigné pour ajouter une apparence au visage existant au lieu de le remplacer.
+    var appearanceName: String?
 
     private var scans: [[FaceEmbedding]] = []
     private var runtime: NoyaRuntime?
@@ -133,10 +137,22 @@ final class EnrollmentModel {
         guard let enroller else { return }
         phase = .saving
         let scans = self.scans
-        let saved = await Task.detached(priority: .userInitiated) {
-            (try? enroller.saveEnrollment(scans: scans)) != nil
+        let name = appearanceName
+        let outcome = await Task.detached(priority: .userInitiated) { () -> FailureReason? in
+            do {
+                if let name {
+                    _ = try enroller.addAppearance(named: name, scans: scans)
+                } else {
+                    try enroller.saveEnrollment(scans: scans)
+                }
+                return nil
+            } catch VerificationPipelineError.differentPerson {
+                return .differentPerson
+            } catch {
+                return .saveFailed
+            }
         }.value
-        phase = saved ? .done : .failed(.saveFailed)
+        phase = outcome.map { .failed($0) } ?? .done
     }
 
     /// Recommence depuis le premier tour (après un échec).

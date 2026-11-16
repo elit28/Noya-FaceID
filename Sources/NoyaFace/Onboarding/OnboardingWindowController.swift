@@ -17,13 +17,22 @@ final class OnboardingWindowController {
         window.makeKeyAndOrderFront(nil)
     }
 
+    /// Ouvre l'assistant directement à l'étape « Visage » (réenregistrement depuis les réglages).
+    func showEnrollment() {
+        close()
+        let window = makeWindow(startStep: .face)
+        self.window = window
+        NSApplication.shared.activate()
+        window.makeKeyAndOrderFront(nil)
+    }
+
     func close() {
         window?.close()
         window = nil
     }
 
-    private func makeWindow() -> NSWindow {
-        let view = OnboardingView(onFinish: { [weak self] in self?.close() })
+    private func makeWindow(startStep: OnboardingView.Step = .welcome) -> NSWindow {
+        let view = OnboardingView(startStep: startStep, onFinish: { [weak self] in self?.close() })
         let window = NSWindow(contentViewController: NSHostingController(rootView: view))
         window.title = String(localized: "Configuration de NOYA Face")
         window.styleMask = [.titled, .closable, .miniaturizable]

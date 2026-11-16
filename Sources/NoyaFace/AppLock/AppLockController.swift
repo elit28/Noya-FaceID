@@ -152,6 +152,7 @@ final class AppLockController {
         attemptID = id
         attempt?.cancel()
         shield.model.phase = .scanning
+        IslandController.shared.show(.searching)
         let seconds = TimeInterval(AppModel.shared.settings.scanSeconds)
         attempt = Task { [weak self] in
             guard let runtime = await AppModel.shared.loadRuntime() else {
@@ -174,16 +175,21 @@ final class AppLockController {
         guard !Task.isCancelled, attemptID == id, activeApp?.processIdentifier == app.processIdentifier else { return }
         switch result {
         case .matched:
-            unlock(app)
+            unlock(app, byFace: true)
         case .noMatch:
             shield.model.faceAvailable = true
             shield.model.phase = .refused(.notRecognized)
+            IslandController.shared.flash(.refused, seconds: 1.6)
+            let name = app.localizedName ?? AppInfo.name
+            ActivityLog.shared.record(.refused, "\(name) : visage non reconnu")
         case .unavailable:
             shield.model.faceAvailable = true
             shield.model.phase = .refused(.unavailable)
+            IslandController.shared.hide()
         case nil:
             shield.model.faceAvailable = false
             shield.model.phase = .refused(.noFace)
+            IslandController.shared.hide()
         }
     }
 
@@ -193,6 +199,7 @@ final class AppLockController {
         attemptID = id
         attempt?.cancel()
         shield.model.phase = .system
+        IslandController.shared.hide()
         let name = app.localizedName ?? AppInfo.name
         let reason = String(localized: "déverrouiller \(name)")
         let system = self.system
@@ -202,7 +209,7 @@ final class AppLockController {
                   self.activeApp?.processIdentifier == app.processIdentifier else { return }
             switch result {
             case .success:
-                self.unlock(app)
+                self.unlock(app, byFace: false)
             case .cancelled:
                 self.shield.model.phase = .refused(.cancelled)
             case .failed:
@@ -211,9 +218,14 @@ final class AppLockController {
         }
     }
 
-    private func unlock(_ app: NSRunningApplication) {
+    private func unlock(_ app: NSRunningApplication, byFace: Bool) {
+        let name = app.localizedName ?? AppInfo.name
+        ActivityLog.shared.record(.success, byFace
+            ? "\(name) déverrouillée par reconnaissance faciale"
+            : "\(name) déverrouillée par Touch ID ou mot de passe")
         let id = attemptID
         shield.model.phase = .unlocked
+        IslandController.shared.flash(.success)
         attempt = Task { [weak self] in
             // Laisse voir « Accès accordé » un instant.
             try? await Task.sleep(nanoseconds: 450_000_000)
@@ -232,6 +244,7 @@ final class AppLockController {
 
     private func quitActiveApp() {
         attempt?.cancel()
+        IslandController.shared.hide()
         // Une feuille d'enregistrement ou une fenêtre ne doit pas apparaître après le bouclier.
         activeApp?.hide()
         _ = activeApp?.terminate()
@@ -247,6 +260,7 @@ final class AppLockController {
     }
 
     private func endEverything() {
+        IslandController.shared.hide()
         attempt?.cancel()
         attempt = nil
         attemptID = UUID()
