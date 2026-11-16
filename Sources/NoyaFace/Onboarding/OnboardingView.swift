@@ -24,6 +24,8 @@ struct OnboardingView: View {
     @State private var enrollment = EnrollmentModel()
     @AppStorage(FeatureKeys.appProtection) private var appProtection = true
     @AppStorage(FeatureKeys.awayLock) private var awayLock = true
+    /// Mot de passe vérifié et enregistré pendant l'assistant : le déverrouillage sera activé.
+    @State private var screenUnlock = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -32,10 +34,10 @@ struct OnboardingView: View {
             Group {
                 switch step {
                 case .welcome: WelcomeStep()
-                case .features: FeaturesStep(appProtection: $appProtection, awayLock: $awayLock)
-                case .permissions: PermissionsStep(permissions: permissions, needsAccessibility: awayLock)
+                case .features: FeaturesStep(appProtection: $appProtection, awayLock: $awayLock, screenUnlock: $screenUnlock)
+                case .permissions: PermissionsStep(permissions: permissions, needsAccessibility: awayLock || screenUnlock)
                 case .face: EnrollmentStep(model: enrollment, permissions: permissions)
-                case .done: DoneStep(appProtection: appProtection, awayLock: awayLock,
+                case .done: DoneStep(appProtection: appProtection, awayLock: awayLock, screenUnlock: screenUnlock,
                                      accessibilityGranted: permissions.accessibilityGranted)
                 }
             }
@@ -82,6 +84,13 @@ struct OnboardingView: View {
                 AppLockController.shared.refresh()
                 UserDefaults.standard.set(awayLock, forKey: FeatureKeys.awayLock)
                 AwayLockController.shared.refresh()
+                if screenUnlock {
+                    // Active la surveillance de l'écran verrouillé, puis Touch ID arme la saisie.
+                    Task {
+                        await ScreenUnlockController.shared.enable()
+                        await ScreenUnlockController.shared.arm()
+                    }
+                }
                 onFinish()
                 if appProtection && AppLockController.shared.store.apps.isEmpty {
                     // Étape suivante naturelle : choisir les apps à protéger.
@@ -186,6 +195,8 @@ private struct WelcomeStep: View {
 private struct FeaturesStep: View {
     @Binding var appProtection: Bool
     @Binding var awayLock: Bool
+    @Binding var screenUnlock: Bool
+    @State private var showingUnlockSetup = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -199,11 +210,29 @@ private struct FeaturesStep: View {
                            detail: "Messages, Notes, Photos… masquées jusqu’à votre authentification.", badge: "Recommandé")
                 OptionCard(isOn: $awayLock, title: "Verrouiller le Mac quand je m’éloigne",
                            detail: "Nécessite l’autorisation Accessibilité. La caméra ne s’allume qu’après une période d’inactivité.", badge: "Recommandé")
-                OptionCard(isOn: .constant(false), title: "Déverrouiller l’écran avec mon visage",
-                           detail: "Mode avancé, à activer ensuite dans les réglages : NOYA Face tape votre mot de passe macOS quand votre visage est reconnu.",
-                           badge: "Avancé", enabled: false)
+                OptionCard(isOn: Binding(get: { screenUnlock }, set: { isOn in setScreenUnlock(isOn) }),
+                           title: "Déverrouiller l’écran avec mon visage",
+                           detail: "Mode avancé : NOYA Face tape votre mot de passe macOS à votre place quand votre visage est reconnu.",
+                           badge: "Avancé", advanced: true)
             }
             .padding(.top, 24)
+        }
+        .sheet(isPresented: $showingUnlockSetup) {
+            UnlockSetupView(start: .disclosure) { saved in
+                showingUnlockSetup = false
+                screenUnlock = saved
+            }
+        }
+    }
+
+    /// Cocher ouvre les avertissements puis la saisie du mot de passe (vérifié par macOS) ;
+    /// décocher supprime le mot de passe déjà enregistré.
+    private func setScreenUnlock(_ isOn: Bool) {
+        if isOn {
+            showingUnlockSetup = true
+        } else {
+            screenUnlock = false
+            Task { await ScreenUnlockController.shared.disable() }
         }
     }
 
@@ -213,6 +242,8 @@ private struct FeaturesStep: View {
         let detail: LocalizedStringKey
         let badge: LocalizedStringKey
         var enabled = true
+        /// Badge orange : fonction avancée.
+        var advanced = false
 
         var body: some View {
             Toggle(isOn: $isOn) {
@@ -222,7 +253,7 @@ private struct FeaturesStep: View {
                         Text(badge)
                             .font(.caption.weight(.semibold))
                             .padding(.horizontal, 8).padding(.vertical, 2)
-                            .background(Capsule().fill(enabled ? Color.green.opacity(0.15) : Color.orange.opacity(0.18)))
+                            .background(Capsule().fill(enabled && !advanced ? Color.green.opacity(0.15) : Color.orange.opacity(0.18)))
                     }
                     Text(detail).font(.callout).foregroundStyle(.secondary)
                 }
@@ -320,6 +351,7 @@ private struct PermissionsStep: View {
 private struct DoneStep: View {
     let appProtection: Bool
     let awayLock: Bool
+    let screenUnlock: Bool
     let accessibilityGranted: Bool
 
     var body: some View {
@@ -343,7 +375,9 @@ private struct DoneStep: View {
                 LabeledContent("Verrouillage quand vous vous éloignez") {
                     StatusBadge(text: awayLockStatus, positive: awayLock && accessibilityGranted)
                 }
-                LabeledContent("Déverrouillage de l’écran") { StatusBadge(text: "À activer dans les réglages", positive: false) }
+                LabeledContent("Déverrouillage de l’écran") {
+                    StatusBadge(text: screenUnlockStatus, positive: screenUnlock && accessibilityGranted)
+                }
             }
             .formStyle(.grouped)
             .scrollDisabled(true)
@@ -353,6 +387,11 @@ private struct DoneStep: View {
 }
 
 private extension DoneStep {
+    var screenUnlockStatus: LocalizedStringKey {
+        guard screenUnlock else { return "Désactivé" }
+        return accessibilityGranted ? "Activé · Touch ID à la fin" : "Autorisation Accessibilité requise"
+    }
+
     var awayLockStatus: LocalizedStringKey {
         guard awayLock else { return "Désactivé" }
         return accessibilityGranted ? "Activé" : "Autorisation Accessibilité requise"

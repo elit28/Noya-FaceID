@@ -173,8 +173,6 @@
 "Autorisation Accessibilité requise" = "Autorisation Accessibilité requise";
 
 /* Déverrouillage de l’écran */
-"Mode avancé, à activer ensuite dans les réglages : NOYA Face tape votre mot de passe macOS quand votre visage est reconnu." = "Mode avancé, à activer ensuite dans les réglages : NOYA Face tape votre mot de passe macOS quand votre visage est reconnu.";
-"À activer dans les réglages" = "À activer dans les réglages";
 "autoriser la saisie automatique de votre mot de passe sur l’écran verrouillé" = "autoriser la saisie automatique de votre mot de passe sur l’écran verrouillé";
 "NOYA Face tape votre mot de passe macOS à votre place quand votre visage est reconnu. Désactivé par défaut." = "NOYA Face tape votre mot de passe macOS à votre place quand votre visage est reconnu. Désactivé par défaut.";
 "Le mot de passe enregistré a été refusé par macOS (changé depuis ?). Saisissez-le de nouveau." = "Le mot de passe enregistré a été refusé par macOS (changé depuis ?). Saisissez-le de nouveau.";
@@ -208,3 +206,5 @@
 "Enregistrer" = "Enregistrer";
 "Mot de passe incorrect." = "Mot de passe incorrect.";
 "macOS n’a pas pu vérifier le mot de passe. Réessayez." = "macOS n’a pas pu vérifier le mot de passe. Réessayez.";
+"Mode avancé : NOYA Face tape votre mot de passe macOS à votre place quand votre visage est reconnu." = "Mode avancé : NOYA Face tape votre mot de passe macOS à votre place quand votre visage est reconnu.";
+"Activé · Touch ID à la fin" = "Activé · Touch ID à la fin";
