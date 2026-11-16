@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  controles:
+    name: Contrôles du dépôt
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: API privées interdites
+        run: scripts/check-private-api.sh
+      - name: Traductions complètes (fr, en)
+        run: python3 scripts/check-localizations.py
+      - name: Secrets et modèles sous licence restrictive
+        run: scripts/check-repository.sh
+
+  macos:
+    name: Compilation, tests et app (macOS)
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Versions
+        run: |
+          sw_vers
+          xcodebuild -version
+          swift --version
+      - name: Compilation
+        run: swift build
+      - name: Tests
+        run: swift test
+      - name: Construction de l’app (signature ad hoc, Hardened Runtime)
+        run: scripts/build-app.sh "0.1.0" "${{ github.run_number }}"
+      - name: Archive de l’app
+        run: ditto -c -k --keepParent "dist/NOYA Face.app" "dist/NOYA-Face-dev.zip"
+      - name: Publication de l’archive (non notarisée)
+        uses: actions/upload-artifact@v4
+        with:
+          name: NOYA-Face-dev
+          path: dist/NOYA-Face-dev.zip
+          retention-days: 14

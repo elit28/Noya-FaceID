@@ -491,10 +491,10 @@ flowchart LR
 | 1 | Identifiant de l'app | `fr.noya360.noyaface` (domaine noya360.fr) |
 | 2 | macOS minimum | macOS 14 Sonoma |
 | 3 | Mac de test | Xcode pas encore installé : à installer avant le jalon J1 (gratuit, Mac App Store) |
-| 4 | Compte Apple Developer | **Souscription immédiate décidée.** Notarisation prévue pour les versions publiées. Le mode « déverrouillage de l'écran » reste indisponible tant que la protection du mot de passe par Touch ID dans le Trousseau n'est pas vérifiée sur Mac (J5). Le guide d'installation explique l'autorisation dans Réglages Système pour les versions non notarisées (compilation personnelle), sans aucune commande de contournement. |
+| 4 | Compte Apple Developer | **Reporté (« plus tard, on verra »).** En attendant : signature ad hoc ou identité locale, pas de notarisation ; le guide d'installation explique « Ouvrir quand même » dans Réglages Système, sans aucune commande de contournement. Le mode « déverrouillage de l'écran » reste **indisponible** tant que la protection du mot de passe par Touch ID dans le Trousseau n'est pas possible. |
 | 5 | Nom du dépôt | Renommer `Noya-FaceID` en `noya-face` (action du propriétaire, avant J1) |
 | 6 | Branche principale | Conservée : `Branche-Principale-Noya-FaceID` |
-| 7 | Modèle de reconnaissance | **SFace (OpenCV Zoo, Apache-2.0)** évalué au jalon J2 ; aucun poids ArcFace dans le dépôt. Les modèles InsightFace sont téléchargeables sur GitHub, mais leur licence (recherche non commerciale, licence des paquets `buffalo_*` sur demande) n'autorise pas leur redistribution ; contact InsightFace en attente de décision. |
+| 7 | Modèle de reconnaissance | **SFace (OpenCV Zoo, Apache-2.0) uniquement** (« au plus simple et au mieux »), évalué au jalon J2 ; aucun contact avec InsightFace ; aucun poids ArcFace dans le dépôt (contrôlé par la CI et un test). |
 | 8 | Langues | Français et anglais complets en v1, puis espagnol, allemand, italien et portugais |
 | 9 | Couleur | Suit la couleur d'accentuation de macOS |
 | 10 | Visages | **Un seul visage par Mac.** Des apparences du même visage (lunettes, barbe, éclairage) peuvent être ajoutées ; chacune doit correspondre au visage déjà enregistré |
@@ -504,4 +504,4 @@ flowchart LR
 | 14 | Performances | Processeur quasi nul au repos, caméra uniquement pendant les recherches, aucune connexion réseau sans action de l'utilisateur |
 | 15 | Homebrew | Plus tard |
 | 16 | Maquette | Ajout des écrans : choix de la caméra, mot de passe en mode avancé, sélecteur d'applications, erreurs, notifications, plusieurs écrans, désinstallation |
-| 17 | Démarrage du code | **Après validation complète des maquettes** |
+| 17 | Démarrage du code | Maquettes **validées le 16/11/2026** ; jalon J1 (socle) démarré |
