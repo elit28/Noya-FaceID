@@ -11,10 +11,13 @@ public struct LockScreenEnvironment {
     public var loadPassword: () throws -> String
     public var wakeDisplay: () -> Void
     public var sleep: (TimeInterval) -> Void
+    /// La saisie automatique a été armée par Touch ID ou le mot de passe (voir `UnlockArming`).
+    public var isArmed: () -> Bool
 
     public init(
         isLocked: @escaping () -> Bool?, displayIsAwake: @escaping () -> Bool, accessibilityTrusted: @escaping () -> Bool,
-        loadPassword: @escaping () throws -> String, wakeDisplay: @escaping () -> Void, sleep: @escaping (TimeInterval) -> Void
+        loadPassword: @escaping () throws -> String, wakeDisplay: @escaping () -> Void, sleep: @escaping (TimeInterval) -> Void,
+        isArmed: @escaping () -> Bool = { true }
     ) {
         self.isLocked = isLocked
         self.displayIsAwake = displayIsAwake
@@ -22,9 +25,10 @@ public struct LockScreenEnvironment {
         self.loadPassword = loadPassword
         self.wakeDisplay = wakeDisplay
         self.sleep = sleep
+        self.isArmed = isArmed
     }
 
-    public static func live(store: SecureStore) -> LockScreenEnvironment {
+    public static func live(store: SecureStore, isArmed: @escaping () -> Bool = { true }) -> LockScreenEnvironment {
         LockScreenEnvironment(
             isLocked: { isScreenLocked() },
             displayIsAwake: { CGDisplayIsAsleep(CGMainDisplayID()) == 0 },
@@ -41,7 +45,8 @@ public struct LockScreenEnvironment {
                 task.arguments = ["-u", "-t", "1"]
                 try? task.run()
             },
-            sleep: { Thread.sleep(forTimeInterval: $0) }
+            sleep: { Thread.sleep(forTimeInterval: $0) },
+            isArmed: isArmed
         )
     }
 }
@@ -135,14 +140,9 @@ public final class LockScreenUnlocker: @unchecked Sendable {
             // Paused / turned off are the user's choice, not problems worth reporting.
             return reason == VerificationGate.accessibilityMissing ? report(reason) : .blocked(reason)
         }
+        // Désarmé (redémarrage, délai écoulé, trop d'échecs) : la caméra reste éteinte.
+        guard environment.isArmed() else { return .blocked(VerificationGate.disarmed) }
         guard environment.displayIsAwake() else { return .displayAsleep }
-
-        let password: String
-        do {
-            password = try environment.loadPassword()
-        } catch {
-            return report("stored password unavailable (\(error))")
-        }
 
         stateLock.withLock { scansThisEpisode += 1 }
         onEvent(.lockScreenScanning)
@@ -165,6 +165,15 @@ public final class LockScreenUnlocker: @unchecked Sendable {
                 waitOutAnimation(Self.noFaceCooldown)
             }
             return .noMatch
+        }
+
+        // Le mot de passe n'est déchiffré qu'après une reconnaissance positive (audit §2.2, §6.3).
+        let password: String
+        do {
+            password = try environment.loadPassword()
+        } catch {
+            onEvent(.lockScreenScanEnded)
+            return report("stored password unavailable (\(error))")
         }
 
         stateLock.withLock { attemptedThisEpisode = true }

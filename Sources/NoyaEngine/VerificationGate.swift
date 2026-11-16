@@ -9,6 +9,7 @@ public enum GateDecision: Equatable, Sendable {
 public enum VerificationGate {
     public static let accessibilityMissing = "Accessibility permission missing"
     public static let passwordRejected = "stored password was rejected; save it again in Settings"
+    public static let disarmed = "automatic typing is not armed"
 
     public static func lockScreen(_ settings: EngineSettings, accessibilityTrusted: Bool) -> GateDecision {
         if !settings.setupComplete { return .refuse("setup not complete") }

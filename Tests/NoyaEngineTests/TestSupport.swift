@@ -50,6 +50,7 @@ final class FakeSystem {
     var accessibilityTrusted = true
     var password = "hunter2"
     var passwordError: Error?
+    var armed = true
     private(set) var slept: [TimeInterval] = []
 
     func environment() -> LockScreenEnvironment {
@@ -62,7 +63,8 @@ final class FakeSystem {
                 return self.password
             },
             wakeDisplay: {},
-            sleep: { self.slept.append($0) }
+            sleep: { self.slept.append($0) },
+            isArmed: { self.armed }
         )
     }
 }

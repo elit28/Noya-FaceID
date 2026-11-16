@@ -115,6 +115,11 @@ public final class NoyaRuntime: @unchecked Sendable {
         try interactiveStore.save(Data(password.utf8), as: StoredItems.loginPassword)
     }
 
+    /// Supprime le mot de passe enregistré (désactivation du déverrouillage de l'écran).
+    public func removeLoginPassword() throws {
+        try removeFile(StoredItems.loginPassword)
+    }
+
     /// Deletes the enrolled face, the stored password and the encryption key.
     public func removeAllData() throws {
         try removeFile(StoredItems.faceProfile)

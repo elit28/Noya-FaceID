@@ -32,9 +32,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         AppLockController.shared.refresh()
         AwayLockController.shared.refresh()
-        if AppLockController.shared.isRunning || AwayLockController.shared.isEnabled {
-            // Préchargement des modèles : la première app protégée s'ouvre sans attente.
-            Task { _ = await AppModel.shared.loadRuntime() }
+        if AppLockController.shared.isRunning || AwayLockController.shared.isEnabled || ScreenUnlockController.shared.isEnabled {
+            // Préchargement des modèles : la première vérification se fait sans attente.
+            Task {
+                _ = await AppModel.shared.loadRuntime()
+                await ScreenUnlockController.shared.refresh()
+                if ScreenUnlockController.shared.isEnabled && ScreenUnlockController.shared.hasPassword {
+                    // Toujours désarmé au lancement : Touch ID ou le mot de passe réarment.
+                    await ScreenUnlockController.shared.arm()
+                }
+            }
         }
     }
 

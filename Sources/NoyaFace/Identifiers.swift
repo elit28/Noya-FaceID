@@ -62,6 +62,12 @@ enum AwayLockKeys {
     static let idleMinutes = "awayLock.idleMinutes"
 }
 
+/// Préférences du déverrouillage de l'écran.
+enum ScreenUnlockKeys {
+    /// Durée d'armement de la saisie automatique, en heures.
+    static let armHours = "screenUnlock.armHours"
+}
+
 /// Aspect du bouclier. Opaque par défaut : rien de l'app n'est visible.
 enum ShieldMask: String, CaseIterable {
     case opaque

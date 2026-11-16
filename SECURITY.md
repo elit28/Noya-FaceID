@@ -28,14 +28,21 @@ La **protection d'applications** est une protection de confidentialité : elle m
 
 Le **verrouillage en cas d'absence** allume brièvement la caméra après la période d'inactivité choisie (le voyant vert s'allume) et verrouille le Mac avec le raccourci système ⌃⌘Q, ce qui exige l'autorisation Accessibilité.
 
-Le **déverrouillage de l'écran** est un mode avancé, désactivé par défaut, qui saisit votre mot de passe macOS à votre place. Il reste **indisponible** tant que le mot de passe ne peut pas être protégé par Touch ID au niveau du Trousseau (nécessite une version signée avec un compte Apple Developer).
+Le **déverrouillage de l'écran** est un mode avancé, désactivé par défaut, qui **tape votre mot de passe macOS à votre place** quand votre visage est reconnu. Ce n'est pas une authentification : macOS reçoit le vrai mot de passe. Garde-fous :
+
+- mot de passe vérifié par macOS (OpenDirectory) avant d'être enregistré, puis chiffré (AES-256-GCM) ; il n'est déchiffré qu'après une reconnaissance positive ;
+- saisie automatique **armée par Touch ID ou le mot de passe** (8 h à 7 jours, 24 h par défaut), désarmée à chaque redémarrage, à chaque relance de l'app et après plusieurs visages inconnus ;
+- au plus 2 essais par verrouillage ; un mot de passe refusé par macOS arrête la saisie automatique ;
+- état verrouillé revérifié juste avant de taper ; plusieurs visages visibles → refus.
+
+**Limite sans compte Apple Developer** : le trousseau ne peut pas exiger Touch ID pour lire la clé ; elle est seulement réservée à NOYA Face par la liste d'accès du trousseau. L'armement par Touch ID est appliqué par l'application, pas par le système. Une vidéo de vous peut tromper la détection de présence réelle.
 
 ## Données et stockage
 
 | Donnée | Emplacement | Protection |
 |---|---|---|
 | Empreintes faciales (aucune image) | `~/Library/Application Support/NOYA Face/` (dossier `0700`, fichiers `0600`) | AES-256-GCM, clé dans le Trousseau |
-| Mot de passe macOS (mode avancé seulement) | Trousseau | Chiffré, clé protégée par Touch ID ou mot de passe |
+| Mot de passe macOS (mode avancé seulement) | `~/Library/Application Support/NOYA Face/` | AES-256-GCM ; clé dans le trousseau, réservée à NOYA Face (sans exigence Touch ID : nécessite un compte Apple Developer) ; supprimé à la désactivation |
 | Réglages | `UserDefaults` | Non sensibles |
 | Journaux | Journal de diagnostic local | Jamais de mot de passe, d'image ni d'empreinte |
 

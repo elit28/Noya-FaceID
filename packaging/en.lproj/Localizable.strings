@@ -86,7 +86,6 @@
 "Verrouiller le Mac quand je m’éloigne" = "Lock my Mac when I walk away";
 "Nécessite l’autorisation Accessibilité. La caméra ne s’allume qu’après une période d’inactivité." = "Requires Accessibility permission. The camera only turns on after a period of inactivity.";
 "Déverrouiller l’écran avec mon visage" = "Unlock the screen with my face";
-"Indisponible dans cette version : protéger votre mot de passe par Touch ID nécessite une version signée par un compte Apple Developer." = "Unavailable in this version: protecting your password with Touch ID requires a build signed with an Apple Developer account.";
 "Avancé" = "Advanced";
 "NOYA Face ne demande que le strict nécessaire pour les fonctions choisies." = "NOYA Face only asks for what the chosen features need.";
 "Ouvrir Réglages Système" = "Open System Settings";
@@ -109,7 +108,6 @@
 "Désactivé" = "Off";
 "Verrouillage quand vous vous éloignez" = "Lock when you walk away";
 "Déverrouillage de l’écran" = "Screen unlock";
-"Indisponible (version non signée)" = "Unavailable (unsigned build)";
 "Configuration de NOYA Face" = "NOYA Face Setup";
 "Composants tiers : HeyMac (MIT), Silent-Face-Anti-Spoofing (Apache-2.0), SFace d’OpenCV Zoo (Apache-2.0). Détails dans THIRD_PARTY_NOTICES.md." = "Third-party components: HeyMac (MIT), Silent-Face-Anti-Spoofing (Apache-2.0), SFace from OpenCV Zoo (Apache-2.0). Details in THIRD_PARTY_NOTICES.md.";
 
@@ -173,3 +171,40 @@
 "Le voyant vert de la caméra s’allume pendant chaque vérification. C’est voulu : aucune capture n’est faite à votre insu." = "The camera’s green light turns on during each check. That’s intended: nothing is ever captured without you knowing.";
 "Activé" = "On";
 "Autorisation Accessibilité requise" = "Accessibility permission required";
+
+/* Screen unlock */
+"Mode avancé, à activer ensuite dans les réglages : NOYA Face tape votre mot de passe macOS quand votre visage est reconnu." = "Advanced mode, to turn on later in Settings: NOYA Face types your macOS password when your face is recognized.";
+"À activer dans les réglages" = "Turn on in Settings";
+"autoriser la saisie automatique de votre mot de passe sur l’écran verrouillé" = "allow your password to be typed automatically on the lock screen";
+"NOYA Face tape votre mot de passe macOS à votre place quand votre visage est reconnu. Désactivé par défaut." = "NOYA Face types your macOS password for you when your face is recognized. Off by default.";
+"Le mot de passe enregistré a été refusé par macOS (changé depuis ?). Saisissez-le de nouveau." = "macOS rejected the saved password (has it changed?). Enter it again.";
+"Plusieurs visages inconnus ont été vus sur l’écran verrouillé : la saisie automatique a été désarmée." = "Several unknown faces were seen on the lock screen: automatic typing was disarmed.";
+"Enregistré" = "Saved";
+"Modifier…" = "Change…";
+"Saisir…" = "Enter…";
+"Mot de passe macOS" = "macOS password";
+"Vérifié par macOS avant d’être enregistré, puis chiffré sur ce Mac." = "Verified by macOS before being saved, then encrypted on this Mac.";
+"Désarmer" = "Disarm";
+"Armer avec Touch ID" = "Arm with Touch ID";
+"Saisie automatique" = "Automatic typing";
+"Désarmée à chaque redémarrage et à chaque relance de NOYA Face." = "Disarmed at every restart and every time NOYA Face is relaunched.";
+"Durée d’armement" = "Arming duration";
+"Ensuite, Touch ID ou votre mot de passe est demandé pour réarmer." = "After that, Touch ID or your password is required to arm it again.";
+"Tentatives par verrouillage" = "Attempts per lock";
+"Au-delà, saisissez votre mot de passe. Après plusieurs visages inconnus, la saisie automatique est désarmée." = "After that, type your password. After several unknown faces, automatic typing is disarmed.";
+"Nécessaire pour taper le mot de passe sur l’écran verrouillé." = "Needed to type the password on the lock screen.";
+"Armée jusqu’au %@" = "Armed until %@";
+"%lld h" = "%lld h";
+"%lld jours" = "%lld days";
+"Avant d’activer" = "Before You Turn This On";
+"Votre mot de passe macOS est vérifié par macOS, puis stocké chiffré (AES-256) sur ce Mac. La clé est dans votre trousseau, réservée à NOYA Face." = "Your macOS password is verified by macOS, then stored encrypted (AES-256) on this Mac. The key is in your keychain, reserved for NOYA Face.";
+"Sans compte Apple Developer, le trousseau ne peut pas exiger Touch ID pour lire ce mot de passe. NOYA Face exige donc Touch ID ou votre mot de passe pour armer la saisie automatique, pour une durée limitée." = "Without an Apple Developer account, the keychain can’t require Touch ID to read this password. So NOYA Face requires Touch ID or your password to arm automatic typing, for a limited time.";
+"Une webcam n’est pas Face ID : une vidéo de vous pourrait tromper la détection de présence réelle." = "A webcam is not Face ID: a video of you could fool liveness detection.";
+"Le mot de passe reste obligatoire après un redémarrage, pour FileVault et au changement d’utilisateur." = "Your password is still required after a restart, for FileVault and when switching users.";
+"L’autorisation Accessibilité est nécessaire pour taper le mot de passe." = "Accessibility permission is needed to type the password.";
+"Je comprends, continuer" = "I Understand, Continue";
+"Celui de votre session, vérifié par macOS avant d’être enregistré. Il n’est jamais affiché ni envoyé." = "Your login password, verified by macOS before being saved. It is never shown or sent.";
+"Mot de passe" = "Password";
+"Enregistrer" = "Save";
+"Mot de passe incorrect." = "Incorrect password.";
+"macOS n’a pas pu vérifier le mot de passe. Réessayez." = "macOS couldn’t verify the password. Try again.";

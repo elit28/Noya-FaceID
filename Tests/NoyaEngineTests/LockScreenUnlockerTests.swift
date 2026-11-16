@@ -188,3 +188,41 @@ private struct ThrowingTypist: PasswordTyping {
     guard case .typingFailed = unlocker.tick() else { Issue.record("expected .typingFailed"); return }
     #expect(recorder.events == [.lockScreenScanning, .lockScreenScanEnded])
 }
+
+@Test func aDisarmedUnlockerNeverTurnsTheCameraOn() {
+    let system = FakeSystem()
+    system.armed = false
+    let matcher = FakeMatcher()
+    matcher.outcome = matchedOutcome()
+    let typist = FakeTypist(system: system, unlocks: true)
+    let settings = makeTestSettings { $0.lockScreenEnabled = true }
+    let recorder = EventRecorder()
+    let unlocker = makeUnlocker(system: system, matcher: matcher, typist: typist, settings: settings, recorder: recorder)
+
+    #expect(unlocker.tick() == .blocked(VerificationGate.disarmed))
+    #expect(matcher.callCount == 0)
+    #expect(typist.typed.isEmpty)
+    #expect(recorder.events.isEmpty)
+}
+
+@Test func thePasswordIsOnlyDecryptedAfterAMatch() {
+    let system = FakeSystem()
+    system.passwordError = SecureStoreError.decryptionFailed
+    let matcher = FakeMatcher() // aucun visage reconnu
+    let typist = FakeTypist(system: system, unlocks: true)
+    let settings = makeTestSettings { $0.lockScreenEnabled = true }
+    let recorder = EventRecorder()
+    let unlocker = makeUnlocker(system: system, matcher: matcher, typist: typist, settings: settings, recorder: recorder)
+
+    // Sans correspondance, le mot de passe n'est jamais lu : aucune erreur de stockage signalée.
+    #expect(unlocker.tick() == .noMatch)
+    #expect(!recorder.events.contains { if case .lockScreenProblem = $0 { return true }; return false })
+
+    matcher.outcome = matchedOutcome()
+    system.locked = false
+    unlocker.tick()
+    system.locked = true
+    // Correspondance : la lecture échoue alors, et rien n'est tapé.
+    #expect(unlocker.tick() == .blocked("stored password unavailable (\(SecureStoreError.decryptionFailed))"))
+    #expect(typist.typed.isEmpty)
+}

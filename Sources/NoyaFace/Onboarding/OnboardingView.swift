@@ -200,7 +200,7 @@ private struct FeaturesStep: View {
                 OptionCard(isOn: $awayLock, title: "Verrouiller le Mac quand je m’éloigne",
                            detail: "Nécessite l’autorisation Accessibilité. La caméra ne s’allume qu’après une période d’inactivité.", badge: "Recommandé")
                 OptionCard(isOn: .constant(false), title: "Déverrouiller l’écran avec mon visage",
-                           detail: "Indisponible dans cette version : protéger votre mot de passe par Touch ID nécessite une version signée par un compte Apple Developer.",
+                           detail: "Mode avancé, à activer ensuite dans les réglages : NOYA Face tape votre mot de passe macOS quand votre visage est reconnu.",
                            badge: "Avancé", enabled: false)
             }
             .padding(.top, 24)
@@ -343,7 +343,7 @@ private struct DoneStep: View {
                 LabeledContent("Verrouillage quand vous vous éloignez") {
                     StatusBadge(text: awayLockStatus, positive: awayLock && accessibilityGranted)
                 }
-                LabeledContent("Déverrouillage de l’écran") { StatusBadge(text: "Indisponible (version non signée)", positive: false) }
+                LabeledContent("Déverrouillage de l’écran") { StatusBadge(text: "À activer dans les réglages", positive: false) }
             }
             .formStyle(.grouped)
             .scrollDisabled(true)

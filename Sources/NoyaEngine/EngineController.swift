@@ -27,12 +27,13 @@ public final class EngineController: @unchecked Sendable {
 
     public convenience init(
         runtime: NoyaRuntime, settings: EngineSettings, log: AppLog = .shared,
+        isArmed: @escaping () -> Bool = { true },
         onEvent: @escaping (EngineEvent) -> Void
     ) {
         self.init(
             settings: settings, log: log,
             makeMatcher: { runtime.verifier(interactive: false, strictness: settings.strictness, distance: settings.detectionDistance) },
-            lockScreenEnvironment: .live(store: runtime.backgroundStore),
+            lockScreenEnvironment: .live(store: runtime.backgroundStore, isArmed: isArmed),
             onEvent: onEvent
         )
     }
