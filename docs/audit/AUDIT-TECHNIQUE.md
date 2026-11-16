@@ -505,3 +505,13 @@ flowchart LR
 | 15 | Homebrew | Plus tard |
 | 16 | Maquette | Ajout des écrans : choix de la caméra, mot de passe en mode avancé, sélecteur d'applications, erreurs, notifications, plusieurs écrans, désinstallation |
 | 17 | Démarrage du code | Maquettes **validées le 16/11/2026** ; jalon J1 (socle) démarré |
+
+### 10.2 Avancement (16/11/2026)
+
+| Jalon | État | Preuve attendue |
+|---|---|---|
+| J3 Maquettes | **Validées** | Canevas de maquettes validé par le propriétaire |
+| J1 Socle | Poussé, CI Linux verte, **CI macOS en attente de machine** | Compilation, tests et construction de l'app verts sur macOS |
+| J2 Modèle | SFace téléchargé (SHA-256 vérifié), converti en Core ML (`scripts/convert_sface.py`, fidélité ONNX → PyTorch : cosinus 1,000000), intégré ; seuils provisoires | Test de fidélité Core ML vert sur macOS ; mesures sur le Mac selon `docs/tests/PROTOCOLE-RECONNAISSANCE.md` |
+| J4 Reconnaissance | Profil « un visage, plusieurs apparences », refus multi-visages et visage trop loin, durée de recherche et distance réglables, tests unitaires | Tests verts sur macOS ; protocole manuel sur le Mac |
+| Swift 6 | Moteur migré en mode strict | Compilation verte sur macOS |

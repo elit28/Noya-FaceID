@@ -7,14 +7,14 @@ Document de référence de l'architecture. Les choix et leur justification figur
 ```mermaid
 flowchart LR
     APP["NoyaFace<br/>(app de barre des menus)<br/>Swift 6"] --> CORE["NoyaCore<br/>reconnaissance, présence réelle,<br/>stockage chiffré, état du verrouillage<br/>Swift 6"]
-    ENG["NoyaEngine<br/>caméra, enrôlement, vérification,<br/>protection d'applications<br/>Swift 5 → 6"] --> CORE
+    ENG["NoyaEngine<br/>caméra, enrôlement, vérification,<br/>protection d'applications<br/>Swift 6"] --> CORE
     TESTS["Tests<br/>NoyaCoreTests, NoyaEngineTests"] -.-> CORE
     TESTS -.-> ENG
 ```
 
 | Module | Rôle | Origine |
 |---|---|---|
-| `NoyaCore` | Détection (Vision), alignement 5 points, extracteur d'empreinte (modèle ajouté au jalon J2), classifieur anti-usurpation MiniFASNet, stockage AES-GCM, lecture de l'état de verrouillage | HeyMac (MIT), adapté |
+| `NoyaCore` | Détection (Vision, tous les visages), alignement 5 points, empreinte SFace (Core ML), profil « un visage, plusieurs apparences », classifieur anti-usurpation MiniFASNet, stockage AES-GCM, lecture de l'état de verrouillage | HeyMac (MIT), adapté ; SFace (Apache-2.0) |
 | `NoyaEngine` | Capture caméra à la demande, enrôlement, fenêtres de vérification bornées, coordination visage → Touch ID / mot de passe, sessions de confiance des apps protégées | HeyMac (MIT), adapté |
 | `NoyaFace` | Application : icône de barre des menus (masquable), fenêtre de réglages, état réel des composants | Nouveau |
 
