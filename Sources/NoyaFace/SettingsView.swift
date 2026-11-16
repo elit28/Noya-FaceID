@@ -30,6 +30,8 @@ struct SettingsView: View {
 
             ProtectedAppsSection()
 
+            AwayLockSection()
+
             Section("Barre des menus") {
                 Toggle("Afficher l’icône dans la barre des menus", isOn: $menuBarIconVisible)
                 if !menuBarIconVisible {

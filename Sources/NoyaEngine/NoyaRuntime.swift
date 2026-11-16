@@ -57,6 +57,25 @@ public final class NoyaRuntime: @unchecked Sendable {
         FaceVerifier(camera: camera, pipeline: pipeline(interactive: interactive, strictness: strictness, distance: distance), sessionLock: sessionLock)
     }
 
+    /// Vérification de présence du verrouillage en cas d'absence : sans invite du trousseau,
+    /// tolérante à la distance (on s'adosse pour lire) et aux autres visages (on regarde une
+    /// vidéo à deux) ; le visage le plus grand doit rester le vôtre.
+    public func presenceVerifier(strictness: MatchStrictness) -> FaceVerifier {
+        let pipeline = VerificationPipeline(
+            embedder: embedder, classifier: classifier, store: backgroundStore,
+            config: Self.presenceConfig(strictness: strictness)
+        )
+        return FaceVerifier(camera: camera, pipeline: pipeline, sessionLock: sessionLock)
+    }
+
+    static func presenceConfig(strictness: MatchStrictness) -> PipelineConfig {
+        PipelineConfig(
+            matchThreshold: strictness.threshold,
+            minimumFaceWidthFraction: CGFloat(DetectionDistance.far.minimumFaceWidthFraction),
+            rejectMultipleFaces: false
+        )
+    }
+
     /// Plusieurs visages visibles : toujours refusé (écran verrouillé comme apps protégées).
     static func config(strictness: MatchStrictness, distance: DetectionDistance) -> PipelineConfig {
         PipelineConfig(

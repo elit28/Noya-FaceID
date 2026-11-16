@@ -163,3 +163,13 @@
 "À choisir dans les réglages" = "Choose them in Settings";
 "Version de développement : d’autres fonctions arrivent dans les prochains jalons." = "Development version: more features arrive in upcoming milestones.";
 "quitter NOYA Face et retirer la protection des applications" = "quit NOYA Face and remove app protection";
+
+/* Away lock */
+"Verrouillage automatique" = "Automatic Lock";
+"La caméra ne s’allume qu’après une période sans clavier ni souris, puis vérifie brièvement votre présence." = "The camera only turns on after a period without keyboard or mouse activity, then briefly checks that you’re there.";
+"Délai d’absence" = "Time away";
+"%lld min" = "%lld min";
+"Nécessaire pour envoyer le raccourci système de verrouillage (⌃⌘Q)." = "Needed to send the system lock shortcut (⌃⌘Q).";
+"Le voyant vert de la caméra s’allume pendant chaque vérification. C’est voulu : aucune capture n’est faite à votre insu." = "The camera’s green light turns on during each check. That’s intended: nothing is ever captured without you knowing.";
+"Activé" = "On";
+"Autorisation Accessibilité requise" = "Accessibility permission required";

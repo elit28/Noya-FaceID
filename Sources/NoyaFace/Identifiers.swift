@@ -56,6 +56,12 @@ enum AppLockKeys {
     }
 }
 
+/// Préférences du verrouillage en cas d'absence.
+enum AwayLockKeys {
+    /// Délai d'inactivité avant la première vérification, en minutes.
+    static let idleMinutes = "awayLock.idleMinutes"
+}
+
 /// Aspect du bouclier. Opaque par défaut : rien de l'app n'est visible.
 enum ShieldMask: String, CaseIterable {
     case opaque

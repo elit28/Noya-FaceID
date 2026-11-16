@@ -163,3 +163,13 @@
 "À choisir dans les réglages" = "À choisir dans les réglages";
 "Version de développement : d’autres fonctions arrivent dans les prochains jalons." = "Version de développement : d’autres fonctions arrivent dans les prochains jalons.";
 "quitter NOYA Face et retirer la protection des applications" = "quitter NOYA Face et retirer la protection des applications";
+
+/* Verrouillage en cas d’absence */
+"Verrouillage automatique" = "Verrouillage automatique";
+"La caméra ne s’allume qu’après une période sans clavier ni souris, puis vérifie brièvement votre présence." = "La caméra ne s’allume qu’après une période sans clavier ni souris, puis vérifie brièvement votre présence.";
+"Délai d’absence" = "Délai d’absence";
+"%lld min" = "%lld min";
+"Nécessaire pour envoyer le raccourci système de verrouillage (⌃⌘Q)." = "Nécessaire pour envoyer le raccourci système de verrouillage (⌃⌘Q).";
+"Le voyant vert de la caméra s’allume pendant chaque vérification. C’est voulu : aucune capture n’est faite à votre insu." = "Le voyant vert de la caméra s’allume pendant chaque vérification. C’est voulu : aucune capture n’est faite à votre insu.";
+"Activé" = "Activé";
+"Autorisation Accessibilité requise" = "Autorisation Accessibilité requise";

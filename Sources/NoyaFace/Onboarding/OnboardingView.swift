@@ -35,7 +35,8 @@ struct OnboardingView: View {
                 case .features: FeaturesStep(appProtection: $appProtection, awayLock: $awayLock)
                 case .permissions: PermissionsStep(permissions: permissions, needsAccessibility: awayLock)
                 case .face: EnrollmentStep(model: enrollment, permissions: permissions)
-                case .done: DoneStep(appProtection: appProtection, awayLock: awayLock)
+                case .done: DoneStep(appProtection: appProtection, awayLock: awayLock,
+                                     accessibilityGranted: permissions.accessibilityGranted)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -79,6 +80,8 @@ struct OnboardingView: View {
                 AppModel.shared.completeOnboarding()
                 AppLockController.shared.store.enabled = appProtection
                 AppLockController.shared.refresh()
+                UserDefaults.standard.set(awayLock, forKey: FeatureKeys.awayLock)
+                AwayLockController.shared.refresh()
                 onFinish()
                 if appProtection && AppLockController.shared.store.apps.isEmpty {
                     // Étape suivante naturelle : choisir les apps à protéger.
@@ -317,6 +320,7 @@ private struct PermissionsStep: View {
 private struct DoneStep: View {
     let appProtection: Bool
     let awayLock: Bool
+    let accessibilityGranted: Bool
 
     var body: some View {
         VStack(spacing: 0) {
@@ -337,7 +341,7 @@ private struct DoneStep: View {
                     StatusBadge(text: appProtection ? "À choisir dans les réglages" : "Désactivé", positive: appProtection)
                 }
                 LabeledContent("Verrouillage quand vous vous éloignez") {
-                    StatusBadge(text: awayLock ? "Arrive dans une prochaine version" : "Désactivé", positive: false)
+                    StatusBadge(text: awayLockStatus, positive: awayLock && accessibilityGranted)
                 }
                 LabeledContent("Déverrouillage de l’écran") { StatusBadge(text: "Indisponible (version non signée)", positive: false) }
             }
@@ -345,6 +349,13 @@ private struct DoneStep: View {
             .scrollDisabled(true)
             .frame(height: 230)
         }
+    }
+}
+
+private extension DoneStep {
+    var awayLockStatus: LocalizedStringKey {
+        guard awayLock else { return "Désactivé" }
+        return accessibilityGranted ? "Activé" : "Autorisation Accessibilité requise"
     }
 }
 

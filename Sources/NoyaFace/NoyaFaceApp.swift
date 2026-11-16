@@ -31,7 +31,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             SettingsWindowController.shared.show()
         }
         AppLockController.shared.refresh()
-        if AppLockController.shared.isRunning {
+        AwayLockController.shared.refresh()
+        if AppLockController.shared.isRunning || AwayLockController.shared.isEnabled {
             // Préchargement des modèles : la première app protégée s'ouvre sans attente.
             Task { _ = await AppModel.shared.loadRuntime() }
         }
