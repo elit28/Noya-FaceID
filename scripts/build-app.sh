@@ -23,7 +23,7 @@ if [ "${NOYA_UNIVERSAL:-0}" = "1" ]; then echo "Compilation (release, universell
 (cd "$REPO_ROOT" && swift build -c release --product NoyaFace ${ARCH_FLAGS[@]+"${ARCH_FLAGS[@]}"})
 BIN="$(cd "$REPO_ROOT" && swift build -c release --show-bin-path ${ARCH_FLAGS[@]+"${ARCH_FLAGS[@]}"})"
 
-echo "Assemblage de $APP…"
+echo "Assemblage de ${APP}…"
 mkdir -p "$DIST" && touch "$DIST/.metadata_never_index"  # évite que Spotlight indexe cette copie
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources/LICENSES"
