@@ -26,6 +26,9 @@ final class AppLockController {
     private var activeApp: NSRunningApplication?
     private var queue: [NSRunningApplication] = []
     private var justActivatedPID: pid_t?
+    /// Masquer l'app protégée fait passer une autre app au premier plan (souvent le Finder) :
+    /// pendant ce court délai, cette activation ne doit pas retirer le bouclier.
+    private var hideTransitionEnds: TimeInterval = 0
     private var running = false
     private var systemTokens: [NSObjectProtocol] = []
     private var distributedTokens: [NSObjectProtocol] = []
@@ -33,6 +36,23 @@ final class AppLockController {
     private init() {}
 
     var isRunning: Bool { running }
+
+    /// Fermeture de session, redémarrage ou extinction : NOYA Face quitte sans demander.
+    private var quitAuthorized = false
+
+    /// Quitter NOYA Face retire la protection : tant qu'elle est active, Touch ID ou le mot de
+    /// passe sont demandés. Pendant un épisode, il faut d'abord le terminer.
+    func shouldTerminate(_ application: NSApplication) -> NSApplication.TerminateReply {
+        guard running, !quitAuthorized else { return .terminateNow }
+        if activeApp != nil { return .terminateCancel }
+        let system = self.system
+        let reason = String(localized: "quitter NOYA Face et retirer la protection des applications")
+        Task {
+            let result = await system.authenticate(reason: reason)
+            application.reply(toApplicationShouldTerminate: result == .success)
+        }
+        return .terminateLater
+    }
 
     /// Démarre ou arrête la surveillance selon les réglages.
     func refresh() {
@@ -105,7 +125,7 @@ final class AppLockController {
 
     private func begin(_ app: NSRunningApplication) {
         activeApp = app
-        app.hide()
+        hideProtectedApp(app)
         let model = shield.model
         model.onUseSystem = { [weak self] in self?.useSystemAuthentication() }
         model.onRetry = { [weak self] in self?.startFaceRecognition() }
@@ -116,9 +136,14 @@ final class AppLockController {
     }
 
     private func reclaimFocus() {
-        activeApp?.hide()
+        if let activeApp { hideProtectedApp(activeApp) }
         shield.focus()
         NSApp.activate()
+    }
+
+    private func hideProtectedApp(_ app: NSRunningApplication) {
+        hideTransitionEnds = ProcessInfo.processInfo.systemUptime + 1
+        app.hide()
     }
 
     private func startFaceRecognition() {
@@ -250,6 +275,12 @@ final class AppLockController {
             try? await Task.sleep(nanoseconds: 350_000_000)
             guard let self, let current = self.activeApp, current.processIdentifier == lockedPID,
                   NSWorkspace.shared.frontmostApplication?.processIdentifier == otherPID else { return }
+            if ProcessInfo.processInfo.systemUptime < self.hideTransitionEnds {
+                // Activation provoquée par le masquage : le bouclier reprend le premier plan.
+                self.shield.focus()
+                NSApp.activate()
+                return
+            }
             self.attempt?.cancel()
             self.shield.dismiss()
             current.hide()
@@ -282,6 +313,9 @@ final class AppLockController {
                 MainActor.assumeIsolated { self?.revokeAllIfEnabled() }
             })
         }
+        systemTokens.append(center.addObserver(forName: NSWorkspace.willPowerOffNotification, object: nil, queue: .main) { [weak self] _ in
+            MainActor.assumeIsolated { self?.quitAuthorized = true }
+        })
         distributedTokens.append(DistributedNotificationCenter.default().addObserver(
             forName: Notification.Name(SystemNotifications.screenIsLocked), object: nil, queue: .main
         ) { [weak self] _ in

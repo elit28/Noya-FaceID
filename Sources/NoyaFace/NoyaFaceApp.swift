@@ -37,6 +37,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        AppLockController.shared.shouldTerminate(sender)
+    }
+
     /// Appelé quand l'utilisateur relance NOYA Face (Applications, Spotlight) alors qu'elle tourne déjà.
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
         if AppModel.shared.onboardingComplete {
