@@ -13,13 +13,17 @@ public struct VerificationOutcome: Equatable, Sendable {
     public var wrongFaceFrames = 0
     public var longestWrongStreak = 0
     public var matchThreshold: Float = 0
+    /// Images refusées parce que plusieurs visages étaient visibles.
+    public var framesWithMultipleFaces = 0
+    /// Images où le visage était trop petit (trop loin).
+    public var framesTooFar = 0
 
     public init() {}
 
     public var debugSummary: String {
-        String(format: "faceFrames=%d noFaceFrames=%d wrongFaceFrames=%d longestWrongStreak=%d/%d bestSimilarity=%.3f threshold=%.2f bestLiveness=%.3f",
+        String(format: "faceFrames=%d noFaceFrames=%d wrongFaceFrames=%d longestWrongStreak=%d/%d bestSimilarity=%.3f threshold=%.2f bestLiveness=%.3f multipleFaceFrames=%d tooFarFrames=%d",
                framesEvaluated, framesWithoutFace, wrongFaceFrames, longestWrongStreak, FaceVerifier.mismatchFrames,
-               bestSimilarity, matchThreshold, bestLiveness)
+               bestSimilarity, matchThreshold, bestLiveness, framesWithMultipleFaces, framesTooFar)
     }
 
     public var summary: String {
@@ -62,11 +66,14 @@ public final class FaceVerifier: FaceMatching, @unchecked Sendable {
         }
         defer { sessionLock.unlock() }
 
-        // Load the enrollment before touching the camera: no enrollment or no key access
-        // fails instantly, without flashing the camera light.
-        let centroid: FaceEmbedding
+        // Le profil est chargé avant d'allumer la caméra : sans enrôlement ou sans accès à la
+        // clé, l'échec est immédiat et le voyant de la caméra ne s'allume pas.
+        let profile: FaceProfile
         do {
-            centroid = try pipeline.loadEnrolledCentroid()
+            profile = try pipeline.loadProfile()
+        } catch VerificationPipelineError.staleEnrollment {
+            outcome.failure = "enrollment made with another model: enroll your face again"
+            return outcome
         } catch KeychainKeyProviderError.interactionRequired {
             outcome.failure = "keychain access needs approval: open NOYA Face and run the face test"
             return outcome
@@ -98,7 +105,7 @@ public final class FaceVerifier: FaceMatching, @unchecked Sendable {
             }
             lastSequence = frame.sequence
             do {
-                let evaluation = try pipeline.evaluate(image: frame.image, against: centroid)
+                let evaluation = try pipeline.evaluate(image: frame.image, against: profile)
                 outcome.framesEvaluated += 1
                 outcome.bestSimilarity = max(outcome.bestSimilarity, evaluation.similarity)
                 outcome.bestLiveness = max(outcome.bestLiveness, evaluation.liveness)
@@ -114,6 +121,13 @@ public final class FaceVerifier: FaceMatching, @unchecked Sendable {
                     outcome.mismatched = true
                     return outcome
                 }
+            } catch VerificationPipelineError.multipleFaces {
+                outcome.framesWithMultipleFaces += 1
+                consecutive = 0
+            } catch VerificationPipelineError.faceTooFar {
+                outcome.framesTooFar += 1
+                consecutive = 0
+                wrongStreak = 0
             } catch {
                 outcome.framesWithoutFace += 1
                 consecutive = 0

@@ -27,5 +27,6 @@ public enum EngineEvent: Equatable, Sendable {
 
 public enum StoredItems {
     public static let loginPassword = "login-password"
-    public static let faceCentroid = "face-centroid"
+    /// Visage enregistré et ses apparences (JSON chiffré).
+    public static let faceProfile = "face-profile"
 }

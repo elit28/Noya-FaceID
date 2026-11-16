@@ -68,7 +68,6 @@ public final class LockScreenUnlocker: @unchecked Sendable {
     static let pollInterval: TimeInterval = 0.25
     static let noMatchCooldown: TimeInterval = 3.5
     static let noFaceCooldown: TimeInterval = 1
-    static let scanWindow: TimeInterval = 6
     static let maxScansPerEpisode = 2
 
     private let matcher: FaceMatching
@@ -148,7 +147,7 @@ public final class LockScreenUnlocker: @unchecked Sendable {
         stateLock.withLock { scansThisEpisode += 1 }
         onEvent(.lockScreenScanning)
         let outcome = matcher.run(
-            timeout: Self.scanWindow, requiredConsecutive: 2, waitForTurn: 0,
+            timeout: TimeInterval(settings.scanSeconds), requiredConsecutive: 2, waitForTurn: 0,
             keepGoing: { self.shouldKeepScanning }
         )
         guard outcome.matched else {

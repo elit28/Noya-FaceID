@@ -50,3 +50,23 @@ import Foundation
     settings.setupComplete = false
     #expect(settings.onboardingComplete)
 }
+
+@Test func scanDurationDefaultsToFiveSecondsAndStaysInRange() {
+    let settings = makeTestSettings()
+    #expect(settings.scanSeconds == 5)
+    settings.scanSeconds = 30
+    #expect(settings.scanSeconds == EngineSettings.scanSecondsRange.upperBound)
+    settings.scanSeconds = 0
+    #expect(settings.scanSeconds == EngineSettings.scanSecondsRange.lowerBound)
+    settings.resetAll()
+    #expect(settings.scanSeconds == 5)
+}
+
+@Test func detectionDistanceDefaultsToStandardAndOrdersFaceSizes() {
+    let settings = makeTestSettings()
+    #expect(settings.detectionDistance == .standard)
+    settings.detectionDistance = .far
+    #expect(settings.detectionDistance == .far)
+    #expect(DetectionDistance.far.minimumFaceWidthFraction < DetectionDistance.standard.minimumFaceWidthFraction)
+    #expect(DetectionDistance.standard.minimumFaceWidthFraction < DetectionDistance.close.minimumFaceWidthFraction)
+}

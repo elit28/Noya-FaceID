@@ -16,8 +16,30 @@ public struct DetectedFace: Equatable, Sendable {
     }
 }
 
+/// Résultat d'une détection : le visage principal (le plus grand) et la largeur des autres.
+public struct FaceDetection: Equatable, Sendable {
+    public let primary: DetectedFace
+    /// Largeur, en pixels, de chaque autre visage détecté dans l'image.
+    public let otherFaceWidths: [CGFloat]
+
+    public init(primary: DetectedFace, otherFaceWidths: [CGFloat] = []) {
+        self.primary = primary
+        self.otherFaceWidths = otherFaceWidths
+    }
+}
+
 public protocol FaceDetecting {
     func detectLargestFace(in image: CGImage) throws -> DetectedFace
+    /// Tous les visages : nécessaire pour refuser la reconnaissance quand plusieurs
+    /// personnes sont visibles.
+    func detectFaces(in image: CGImage) throws -> FaceDetection
+}
+
+extension FaceDetecting {
+    /// Par défaut (détecteurs de test), un seul visage.
+    public func detectFaces(in image: CGImage) throws -> FaceDetection {
+        FaceDetection(primary: try detectLargestFace(in: image))
+    }
 }
 
 /// An 8-bit RGBA pixel buffer, top row first. Every model input is resampled from this,
@@ -192,11 +214,25 @@ public struct VisionFaceDetector: FaceDetecting {
     public init() {}
 
     public func detectLargestFace(in image: CGImage) throws -> DetectedFace {
+        try detectFaces(in: image).primary
+    }
+
+    public func detectFaces(in image: CGImage) throws -> FaceDetection {
         let request = VNDetectFaceLandmarksRequest()
         let handler = VNImageRequestHandler(cgImage: image, options: [:])
         do { try handler.perform([request]) } catch { throw FaceEmbedderError.noFaceDetected }
-        guard let face = request.results?.max(by: { $0.boundingBox.width * $0.boundingBox.height < $1.boundingBox.width * $1.boundingBox.height }),
-              let marks = face.landmarks else {
+        let observations = request.results ?? []
+        guard let largest = observations.max(by: { $0.boundingBox.width * $0.boundingBox.height < $1.boundingBox.width * $1.boundingBox.height }) else {
+            throw FaceEmbedderError.noFaceDetected
+        }
+        let others = observations
+            .filter { $0 !== largest }
+            .map { $0.boundingBox.width * CGFloat(image.width) }
+        return FaceDetection(primary: try detectedFace(from: largest, in: image), otherFaceWidths: others)
+    }
+
+    private func detectedFace(from face: VNFaceObservation, in image: CGImage) throws -> DetectedFace {
+        guard let marks = face.landmarks else {
             throw FaceEmbedderError.noFaceDetected
         }
         let size = CGSize(width: image.width, height: image.height)

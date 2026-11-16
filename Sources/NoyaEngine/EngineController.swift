@@ -31,7 +31,7 @@ public final class EngineController: @unchecked Sendable {
     ) {
         self.init(
             settings: settings, log: log,
-            makeMatcher: { runtime.verifier(interactive: false, strictness: settings.strictness) },
+            makeMatcher: { runtime.verifier(interactive: false, strictness: settings.strictness, distance: settings.detectionDistance) },
             lockScreenEnvironment: .live(store: runtime.backgroundStore),
             onEvent: onEvent
         )

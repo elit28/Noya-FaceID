@@ -13,6 +13,10 @@ extension VerificationPipeline: EnrollmentSampling {}
 public enum EnrollmentProgress: Equatable, Sendable {
     case sampleCaptured(count: Int, target: Int, liveness: Float)
     case rejectedNotLive(confidence: Float)
+    /// Plusieurs visages visibles : l'enrôlement est en pause tant que la personne n'est pas seule.
+    case rejectedMultipleFaces
+    /// Visage trop petit : rapprochez-vous.
+    case rejectedTooFar
     case finished(minAgreement: Float, meanAgreement: Float)
     case failed(String)
 }
@@ -91,6 +95,18 @@ public final class Enroller {
                 if now.timeIntervalSince(lastLivenessReport) >= 2 {
                     lastLivenessReport = now
                     onProgress(.rejectedNotLive(confidence: confidence))
+                }
+                sleep(0.03)
+            } catch VerificationPipelineError.multipleFaces {
+                if now.timeIntervalSince(lastLivenessReport) >= 2 {
+                    lastLivenessReport = now
+                    onProgress(.rejectedMultipleFaces)
+                }
+                sleep(0.03)
+            } catch VerificationPipelineError.faceTooFar {
+                if now.timeIntervalSince(lastLivenessReport) >= 2 {
+                    lastLivenessReport = now
+                    onProgress(.rejectedTooFar)
                 }
                 sleep(0.03)
             } catch {

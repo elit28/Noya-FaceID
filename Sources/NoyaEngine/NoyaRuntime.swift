@@ -1,3 +1,4 @@
+import CoreGraphics
 import Foundation
 import NoyaCore
 
@@ -44,16 +45,25 @@ public final class NoyaRuntime: @unchecked Sendable {
         camera = CameraCapture()
     }
 
-    public func pipeline(interactive: Bool, strictness: MatchStrictness) -> VerificationPipeline {
+    public func pipeline(interactive: Bool, strictness: MatchStrictness, distance: DetectionDistance = .standard) -> VerificationPipeline {
         VerificationPipeline(
             embedder: embedder, classifier: classifier,
             store: interactive ? interactiveStore : backgroundStore,
-            config: PipelineConfig(matchThreshold: strictness.threshold)
+            config: Self.config(strictness: strictness, distance: distance)
         )
     }
 
-    public func verifier(interactive: Bool, strictness: MatchStrictness) -> FaceVerifier {
-        FaceVerifier(camera: camera, pipeline: pipeline(interactive: interactive, strictness: strictness), sessionLock: sessionLock)
+    public func verifier(interactive: Bool, strictness: MatchStrictness, distance: DetectionDistance = .standard) -> FaceVerifier {
+        FaceVerifier(camera: camera, pipeline: pipeline(interactive: interactive, strictness: strictness, distance: distance), sessionLock: sessionLock)
+    }
+
+    /// Plusieurs visages visibles : toujours refusé (écran verrouillé comme apps protégées).
+    static func config(strictness: MatchStrictness, distance: DetectionDistance) -> PipelineConfig {
+        PipelineConfig(
+            matchThreshold: strictness.threshold,
+            minimumFaceWidthFraction: CGFloat(distance.minimumFaceWidthFraction),
+            rejectMultipleFaces: true
+        )
     }
 
     public func enroller() -> Enroller {
@@ -66,7 +76,7 @@ public final class NoyaRuntime: @unchecked Sendable {
         let directory = supportDirectory.appendingPathComponent(".enrollment-\(UUID().uuidString)", isDirectory: true)
         let store = SecureStore(keyProvider: interactiveCache, directory: directory)
         let pipeline = VerificationPipeline(embedder: embedder, classifier: classifier, store: store,
-                                            config: PipelineConfig(matchThreshold: strictness.threshold))
+                                            config: Self.config(strictness: strictness, distance: .standard))
         return EnrollmentSession(directory: directory, store: store, destination: interactiveStore,
                                  enroller: Enroller(frames: camera, sampler: pipeline, sessionLock: sessionLock),
                                  verifier: FaceVerifier(camera: camera, pipeline: pipeline, sessionLock: sessionLock))
@@ -80,7 +90,7 @@ public final class NoyaRuntime: @unchecked Sendable {
 
     /// Deletes the enrolled face, the stored password and the encryption key.
     public func removeAllData() throws {
-        try removeFile(StoredItems.faceCentroid)
+        try removeFile(StoredItems.faceProfile)
         try removeFile(StoredItems.loginPassword)
         try interactiveKeys.deleteKey()
         interactiveCache.clearCache()
@@ -112,7 +122,7 @@ public final class EnrollmentSession: @unchecked Sendable {
     }
 
     public func commit() throws {
-        try destination.save(store.load(StoredItems.faceCentroid), as: StoredItems.faceCentroid)
+        try destination.save(store.load(StoredItems.faceProfile), as: StoredItems.faceProfile)
     }
 
     deinit { try? FileManager.default.removeItem(at: directory) }

@@ -25,6 +25,8 @@ public protocol FaceEmbedding_Provider {
 public final class FaceEmbedder: FaceEmbedding_Provider {
     /// Nom de la ressource du modèle de reconnaissance (sans extension).
     public static let modelName = "FaceRecognition"
+    /// Identifiant enregistré avec chaque profil : changer de modèle impose un réenregistrement.
+    public static let modelIdentifier = "SFace-2021dec-coreml-fp16"
 
     private let model: MLModel
     private let inputName = "input_image"
