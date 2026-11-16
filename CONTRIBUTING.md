@@ -21,6 +21,10 @@ swift test
 scripts/build-app.sh
 ```
 
+```bash
+scripts/build-dmg.sh dist/NOYA-Face.dmg
+```
+
 Ouvrir le projet dans Xcode : ouvrez simplement `Package.swift`.
 
 L'app construite se trouve dans `dist/NOYA Face.app`. Elle est signée en ad hoc (ou avec l'identité locale créée une fois par `scripts/create-signing-identity.sh`) et n'est pas notarisée.
@@ -34,6 +38,12 @@ L'app construite se trouve dans `dist/NOYA Face.app`. Elle est signée en ad hoc
 - **Aucun secret** (certificat, clé, identifiant) dans le dépôt ; aucun modèle dont la licence interdit la redistribution.
 - Les fonctions doivent être réelles : pas de bouton décoratif, pas de chiffre affiché sans mesure.
 - Les failles de sécurité se signalent en privé : voir `SECURITY.md`.
+
+## Publier une version
+
+1. Ajoutez les notes `docs/release-notes/<version>.md` et une entrée dans `CHANGELOG.md`.
+2. Fusionnez dans `Branche-Principale-Noya-FaceID` une fois la CI verte.
+3. Onglet *Actions* › *Publication* › *Run workflow* : indiquez la version. Le workflow compile, teste, construit l'app et le DMG, puis publie la version avec les empreintes SHA-256.
 
 ## Propositions de modification
 

@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Faille de sécurité — Security vulnerability
+    url: https://github.com/elit28/Noya-FaceID/security/advisories/new
+    about: Signalement privé, jamais en ticket public. Private report, never a public issue.

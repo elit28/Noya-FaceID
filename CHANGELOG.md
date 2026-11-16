@@ -1,5 +1,9 @@
 # Journal des versions — Changelog
 
+## 1.0.1 (novembre 2026)
+
+- Fenêtre d'installation (DMG) soignée : fond à la marque NOYA, icônes de 128 pt alignées sur une flèche « Glissez NOYA Face dans Applications », fenêtre sans barres, fond Retina. Construite par `scripts/build-dmg.sh` (dmgbuild, sans AppleScript).
+
 ## 1.0.0 (novembre 2026)
 
 Première version stable. Détails et limites : [`docs/release-notes/1.0.0.md`](docs/release-notes/1.0.0.md).

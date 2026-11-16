@@ -1,0 +1,16 @@
+name: Idée — Feature request
+description: Proposer une amélioration. Suggest an improvement.
+labels: ["idée"]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: Besoin
+      description: Quel problème voulez-vous résoudre ?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposition
+      description: Comment l'imaginez-vous dans l'app ?
