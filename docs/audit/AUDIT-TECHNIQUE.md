@@ -491,10 +491,10 @@ flowchart LR
 | 1 | Identifiant de l'app | `fr.noya360.noyaface` (domaine noya360.fr) |
 | 2 | macOS minimum | macOS 14 Sonoma |
 | 3 | Mac de test | Xcode pas encore installé : à installer avant le jalon J1 (gratuit, Mac App Store) |
-| 4 | Compte Apple Developer | **Non souscrit à ce jour.** Conséquences : pas de notarisation ni de distribution sans avertissement Gatekeeper ; protection biométrique du Trousseau très probablement indisponible (à confirmer sur Mac). Le mode « déverrouillage de l'écran » reste donc **indisponible** tant que cette protection n'est pas possible (décision §10 n° 4). |
+| 4 | Compte Apple Developer | **Souscription immédiate décidée.** Notarisation prévue pour les versions publiées. Le mode « déverrouillage de l'écran » reste indisponible tant que la protection du mot de passe par Touch ID dans le Trousseau n'est pas vérifiée sur Mac (J5). Le guide d'installation explique l'autorisation dans Réglages Système pour les versions non notarisées (compilation personnelle), sans aucune commande de contournement. |
 | 5 | Nom du dépôt | Renommer `Noya-FaceID` en `noya-face` (action du propriétaire, avant J1) |
 | 6 | Branche principale | Conservée : `Branche-Principale-Noya-FaceID` |
-| 7 | Modèle de reconnaissance | Pas de demande de licence à InsightFace : **SFace (OpenCV Zoo, Apache-2.0)** évalué au jalon J2 ; aucun poids ArcFace dans le dépôt |
+| 7 | Modèle de reconnaissance | **SFace (OpenCV Zoo, Apache-2.0)** évalué au jalon J2 ; aucun poids ArcFace dans le dépôt. Les modèles InsightFace sont téléchargeables sur GitHub, mais leur licence (recherche non commerciale, licence des paquets `buffalo_*` sur demande) n'autorise pas leur redistribution ; contact InsightFace en attente de décision. |
 | 8 | Langues | Français et anglais complets en v1, puis espagnol, allemand, italien et portugais |
 | 9 | Couleur | Suit la couleur d'accentuation de macOS |
 | 10 | Visages | **Un seul visage par Mac.** Des apparences du même visage (lunettes, barbe, éclairage) peuvent être ajoutées ; chacune doit correspondre au visage déjà enregistré |
