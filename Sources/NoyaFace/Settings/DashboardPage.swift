@@ -7,6 +7,7 @@ struct DashboardPage: View {
 
     @State private var unlock = ScreenUnlockController.shared
     @State private var activity = ActivityLog.shared
+    @State private var updates = UpdateChecker.shared
     @State private var hasFace: Bool?
     @State private var test: TestState = .idle
     @AppStorage(FeatureKeys.appProtection) private var appProtection = false
@@ -23,6 +24,17 @@ struct DashboardPage: View {
 
     var body: some View {
         Form {
+            if case .available(let version, _) = updates.state {
+                Section {
+                    LabeledContent {
+                        Button("Voir") { updates.openDownloadPage() }
+                            .buttonStyle(.borderedProminent)
+                    } label: {
+                        Text("Mise à jour")
+                        Text("La version \(version) de NOYA Face est disponible.")
+                    }
+                }
+            }
             Section {
                 HStack(spacing: 14) {
                     Image(nsImage: BrandMark.appIconImage(size: 52))

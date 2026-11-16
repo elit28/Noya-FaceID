@@ -7,13 +7,13 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Numéro de version (ex. 0.9.0)"
+        description: "Numéro de version (ex. 1.0.0)"
         required: true
-        default: "0.9.0"
+        default: "1.0.0"
       prerelease:
         description: "Pré-version (bêta)"
         type: boolean
-        default: true
+        default: false
 
 permissions:
   contents: write
@@ -37,11 +37,18 @@ jobs:
         env:
           NOYA_UNIVERSAL: "1"
         run: scripts/build-app.sh "$VERSION" "${{ github.run_number }}"
-      - name: Archive et empreinte SHA-256
+      - name: Image disque (DMG) avec raccourci Applications
+        run: |
+          mkdir -p dist/dmg
+          cp -R "dist/NOYA Face.app" dist/dmg/
+          ln -s /Applications dist/dmg/Applications
+          hdiutil create -volname "NOYA Face" -srcfolder dist/dmg -ov -format UDZO "dist/NOYA-Face-${VERSION}.dmg"
+          hdiutil verify "dist/NOYA-Face-${VERSION}.dmg"
+      - name: Archive et empreintes SHA-256
         run: |
           ditto -c -k --keepParent "dist/NOYA Face.app" "dist/NOYA-Face-${VERSION}.zip"
-          (cd dist && shasum -a 256 "NOYA-Face-${VERSION}.zip" > "NOYA-Face-${VERSION}.zip.sha256")
-          cat "dist/NOYA-Face-${VERSION}.zip.sha256"
+          (cd dist && shasum -a 256 "NOYA-Face-${VERSION}.dmg" "NOYA-Face-${VERSION}.zip" > "NOYA-Face-${VERSION}.sha256")
+          cat "dist/NOYA-Face-${VERSION}.sha256"
       - name: Publication de la version GitHub
         env:
           GH_TOKEN: ${{ github.token }}
@@ -51,6 +58,6 @@ jobs:
           TITLE="NOYA Face ${VERSION}"
           if [ "$PRERELEASE" = "true" ]; then FLAGS="--prerelease"; TITLE="${TITLE} (bêta)"; fi
           gh release create "v${VERSION}" \
-            "dist/NOYA-Face-${VERSION}.zip" "dist/NOYA-Face-${VERSION}.zip.sha256" \
+            "dist/NOYA-Face-${VERSION}.dmg" "dist/NOYA-Face-${VERSION}.zip" "dist/NOYA-Face-${VERSION}.sha256" \
             --target "$GITHUB_SHA" --title "$TITLE" \
             --notes-file "docs/release-notes/${VERSION}.md" $FLAGS

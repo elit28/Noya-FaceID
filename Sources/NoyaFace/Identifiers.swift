@@ -19,6 +19,8 @@ enum AppInfo {
     static let name = "NOYA Face"
     static let websiteURL = "https://noya360.fr"
     static let repositoryURL = "https://github.com/elit28/Noya-FaceID"
+    /// Dernière version publiée (hors pré-versions), API publique de GitHub.
+    static let latestReleaseAPI = "https://api.github.com/repos/elit28/Noya-FaceID/releases/latest"
 
     static var version: String {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.0.0"
@@ -32,6 +34,13 @@ enum SystemKeys {
     static let accessibilityPromptOption = "AXTrustedCheckOptionPrompt"
     /// Volet Confidentialité › Caméra de Réglages Système.
     static let cameraSettingsURL = "x-apple.systempreferences:com.apple.preference.security?Privacy_Camera"
+}
+
+/// Préférences des mises à jour.
+enum UpdateKeys {
+    /// Recherche automatique une fois par jour (désactivée par défaut : aucune connexion sinon).
+    static let automatic = "updates.automatic"
+    static let lastCheck = "updates.lastCheck"
 }
 
 /// Préférences des fonctions choisies dans l'assistant.

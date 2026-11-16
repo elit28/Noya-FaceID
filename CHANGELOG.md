@@ -1,5 +1,14 @@
 # Journal des versions — Changelog
 
+## 1.0.0 (novembre 2026)
+
+Première version stable. Détails et limites : [`docs/release-notes/1.0.0.md`](docs/release-notes/1.0.0.md).
+
+- Installateur DMG (glisser dans Applications), en plus de l'archive `.zip`.
+- Recherche de mises à jour depuis l'app (désactivée par défaut, ne contacte que GitHub, n'installe rien seule).
+- Désinstallation complète : visage, mot de passe et clé du trousseau, réglages, journaux, ouverture à la connexion, autorisations si macOS le permet, puis l'app à la Corbeille.
+- Résistance aux photos et vidéos non mesurée (choix du propriétaire), indiquée dans les notes.
+
 ## 0.9.0 — bêta (novembre 2026)
 
 Première version publique, pour essais. Détails et limites : [`docs/release-notes/0.9.0.md`](docs/release-notes/0.9.0.md).

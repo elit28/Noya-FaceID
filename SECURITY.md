@@ -8,7 +8,9 @@
 
 ## État actuel
 
-Version bêta 0.9.0 : les fonctions sont compilées et testées automatiquement sur macOS et ont fonctionné lors des premiers essais sur un Mac, mais la résistance aux photos et vidéos, les seuils de reconnaissance et la consommation **ne sont pas encore mesurés**. Les garanties ci-dessous décrivent les objectifs et les règles du projet ; elles seront vérifiées et mesurées à chaque jalon (voir `docs/audit/AUDIT-TECHNIQUE.md`).
+Version 1.0 : les fonctions sont compilées et testées automatiquement sur macOS et ont fonctionné lors des essais sur un Mac. La résistance aux photos et vidéos et la consommation **n'ont pas été mesurées** (choix du propriétaire du projet) : utilisez le déverrouillage de l'écran en connaissance de cause.
+
+Réseau : aucune connexion par défaut. Seule la recherche de mises à jour, si vous l'activez, envoie une requête à l'API publique de GitHub (`api.github.com`), sans donnée personnelle ; rien n'est installé automatiquement. Les garanties ci-dessous décrivent les objectifs et les règles du projet ; elles seront vérifiées et mesurées à chaque jalon (voir `docs/audit/AUDIT-TECHNIQUE.md`).
 
 ## Ce que NOYA Face protège — et ce qu'il ne protège pas
 
