@@ -13,8 +13,7 @@ final class OnboardingWindowController {
     func show() {
         let window = self.window ?? makeWindow()
         self.window = window
-        NSApplication.shared.activate()
-        window.makeKeyAndOrderFront(nil)
+        AppPresence.present(window)
     }
 
     /// Ouvre l'assistant directement à l'étape « Visage » (réenregistrement depuis les réglages).
@@ -22,8 +21,7 @@ final class OnboardingWindowController {
         close()
         let window = makeWindow(startStep: .face)
         self.window = window
-        NSApplication.shared.activate()
-        window.makeKeyAndOrderFront(nil)
+        AppPresence.present(window)
     }
 
     func close() {

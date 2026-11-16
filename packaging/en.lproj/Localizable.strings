@@ -1,5 +1,4 @@
 /* NOYA Face interface — English. Key = French source text. */
-"Version de développement" = "Development version";
 "Réglages…" = "Settings…";
 "Masquer l’icône de la barre des menus" = "Hide Menu Bar Icon";
 "Quitter NOYA Face" = "Quit NOYA Face";
@@ -367,3 +366,18 @@
 "Supprimé" = "Deleted";
 "À la Corbeille" = "To the Trash";
 "désinstaller NOYA Face et supprimer vos données" = "uninstall NOYA Face and delete your data";
+
+/* App menus */
+"À propos de NOYA Face" = "About NOYA Face";
+"Masquer NOYA Face" = "Hide NOYA Face";
+"Fichier" = "File";
+"Fermer la fenêtre" = "Close Window";
+"Édition" = "Edit";
+"Rétablir" = "Redo";
+"Couper" = "Cut";
+"Copier" = "Copy";
+"Coller" = "Paste";
+"Tout sélectionner" = "Select All";
+"Fenêtre" = "Window";
+"Placer dans le Dock" = "Minimize";
+"Version %@" = "Version %@";

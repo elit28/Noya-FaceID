@@ -6,7 +6,7 @@ struct MenuContent: View {
     @AppStorage(PreferenceKeys.menuBarIconVisible) private var menuBarIconVisible = true
 
     var body: some View {
-        Text("Version de développement")
+        Text("Version \(AppInfo.version)")
         Divider()
         Button("Réglages…") {
             SettingsWindowController.shared.show()

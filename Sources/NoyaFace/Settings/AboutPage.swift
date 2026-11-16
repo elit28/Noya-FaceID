@@ -11,11 +11,8 @@ struct AboutPage: View {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(verbatim: AppInfo.name)
                             .font(.title.weight(.bold))
-                        HStack(spacing: 4) {
-                            Text("Version de développement")
-                            Text(verbatim: AppInfo.version)
-                        }
-                        .foregroundStyle(.secondary)
+                        Text("Version \(AppInfo.version)")
+                            .foregroundStyle(.secondary)
                         Text("Libre et gratuit, par NOYA 360.")
                             .foregroundStyle(.secondary)
                     }
