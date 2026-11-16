@@ -43,19 +43,16 @@ jobs:
       - name: Construction de l’app universelle (signature ad hoc, Hardened Runtime)
         env:
           NOYA_UNIVERSAL: "1"
-        run: scripts/build-app.sh "1.0.0" "${{ github.run_number }}"
+        run: scripts/build-app.sh "1.0.1" "${{ github.run_number }}"
       - name: Archive de l’app
         run: ditto -c -k --keepParent "dist/NOYA Face.app" "dist/NOYA-Face-dev.zip"
       - name: Image disque (DMG), vérifiée comme pour une publication
-        run: |
-          mkdir -p dist/dmg
-          cp -R "dist/NOYA Face.app" dist/dmg/
-          ln -s /Applications dist/dmg/Applications
-          hdiutil create -volname "NOYA Face" -srcfolder dist/dmg -ov -format UDZO dist/NOYA-Face-dev.dmg
-          hdiutil verify dist/NOYA-Face-dev.dmg
+        run: scripts/build-dmg.sh dist/NOYA-Face-dev.dmg
       - name: Publication de l’archive (non notarisée)
         uses: actions/upload-artifact@v4
         with:
           name: NOYA-Face-dev
-          path: dist/NOYA-Face-dev.zip
+          path: |
+            dist/NOYA-Face-dev.zip
+            dist/NOYA-Face-dev.dmg
           retention-days: 14
