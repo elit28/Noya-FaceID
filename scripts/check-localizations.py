@@ -17,7 +17,7 @@ LANGUAGES = ["fr", "en"]
 TABLES = ["Localizable.strings", "InfoPlist.strings"]
 APP_SOURCES = ROOT / "Sources" / "NoyaFace"
 EXCLUDED_FILES = {"Identifiers.swift"}
-NON_LOCALIZED_CONTEXTS = ("verbatim: ", "systemName: ", "keyboardShortcut(", "forKey: ", "id: ",
+NON_LOCALIZED_CONTEXTS = ("verbatim: ", "systemName: ", "symbol: ", "keyboardShortcut(", "forKey: ", "id: ",
                           "named: ", "withExtension: ", "forInfoDictionaryKey: ")
 ENTRY = re.compile(r'^\s*"((?:[^"\\]|\\.)*)"\s*=\s*"((?:[^"\\]|\\.)*)"\s*;\s*$')
 LITERAL = re.compile(r'"((?:[^"\\]|\\.)*)"')

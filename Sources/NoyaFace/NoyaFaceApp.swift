@@ -17,19 +17,26 @@ struct NoyaFaceApp: App {
     }
 }
 
-/// Délégué AppKit : gère la réouverture de l'app quand l'icône de la barre des menus est masquée.
+/// Délégué AppKit : assistant au premier lancement, et réouverture de l'app quand l'icône
+/// de la barre des menus est masquée.
 @MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // Icône masquée : sans fenêtre, l'utilisateur n'aurait aucun moyen d'atteindre les réglages.
-        if !PreferenceKeys.isMenuBarIconVisible {
+        if !AppModel.shared.onboardingComplete {
+            OnboardingWindowController.shared.show()
+        } else if !PreferenceKeys.isMenuBarIconVisible {
+            // Icône masquée : sans fenêtre, l'utilisateur n'aurait aucun moyen d'atteindre les réglages.
             SettingsWindowController.shared.show()
         }
     }
 
     /// Appelé quand l'utilisateur relance NOYA Face (Applications, Spotlight) alors qu'elle tourne déjà.
     func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
-        SettingsWindowController.shared.show()
+        if AppModel.shared.onboardingComplete {
+            SettingsWindowController.shared.show()
+        } else {
+            OnboardingWindowController.shared.show()
+        }
         return true
     }
 }

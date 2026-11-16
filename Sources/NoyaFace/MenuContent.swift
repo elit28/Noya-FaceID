@@ -12,6 +12,9 @@ struct MenuContent: View {
             SettingsWindowController.shared.show()
         }
         .keyboardShortcut(",")
+        Button("Assistant de configuration…") {
+            OnboardingWindowController.shared.show()
+        }
         Button("Masquer l’icône de la barre des menus") {
             menuBarIconVisible = false
             // La fenêtre explique comment retrouver NOYA Face une fois l'icône masquée.

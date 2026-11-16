@@ -22,3 +22,18 @@ enum AppInfo {
         Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.0.0"
     }
 }
+
+/// Clés et identifiants système (valeurs documentées par Apple, non traduites).
+enum SystemKeys {
+    /// Valeur de `kAXTrustedCheckOptionPrompt` : utilisée telle quelle pour éviter l'accès à
+    /// une variable globale C, interdit par la concurrence stricte de Swift 6.
+    static let accessibilityPromptOption = "AXTrustedCheckOptionPrompt"
+    /// Volet Confidentialité › Caméra de Réglages Système.
+    static let cameraSettingsURL = "x-apple.systempreferences:com.apple.preference.security?Privacy_Camera"
+}
+
+/// Préférences des fonctions choisies dans l'assistant.
+enum FeatureKeys {
+    static let appProtection = "feature.appProtection"
+    static let awayLock = "feature.awayLock"
+}

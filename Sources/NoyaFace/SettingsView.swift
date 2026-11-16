@@ -49,7 +49,7 @@ struct SettingsView: View {
                     modelText(status.livenessModel, missing: "Modèle introuvable")
                 }
                 LabeledContent("Reconnaissance faciale") {
-                    modelText(status.recognitionModel, missing: "Non installée (jalon J2)")
+                    modelText(status.recognitionModel, missing: "Modèle introuvable")
                 }
                 LabeledContent("Encoche") {
                     Text(notchLabel)
@@ -58,7 +58,7 @@ struct SettingsView: View {
 
             Section("Confidentialité") {
                 Text("Traitement entièrement local. Aucune image n’est enregistrée, aucune donnée n’est envoyée.")
-                Text("Composants tiers : HeyMac (MIT), Silent-Face-Anti-Spoofing (Apache-2.0). Détails dans THIRD_PARTY_NOTICES.md.")
+                Text("Composants tiers : HeyMac (MIT), Silent-Face-Anti-Spoofing (Apache-2.0), SFace d’OpenCV Zoo (Apache-2.0). Détails dans THIRD_PARTY_NOTICES.md.")
                     .foregroundStyle(.secondary)
             }
         }

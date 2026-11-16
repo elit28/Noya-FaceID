@@ -84,6 +84,14 @@ public final class NoyaRuntime: @unchecked Sendable {
 
     public var hasLoginPassword: Bool { fileExists(StoredItems.loginPassword) }
 
+    /// Un visage est enregistré sur ce Mac.
+    public var hasFaceProfile: Bool { fileExists(StoredItems.faceProfile) }
+
+    /// Enrôlement guidé « tournez la tête », sur le même verrou caméra que les vérifications.
+    public func guidedEnroller(config: GuidedEnrollmentConfig = GuidedEnrollmentConfig()) -> GuidedEnroller {
+        GuidedEnroller(frames: camera, sampler: pipeline(interactive: true, strictness: .normal), sessionLock: sessionLock, config: config)
+    }
+
     public func saveLoginPassword(_ password: String) throws {
         try interactiveStore.save(Data(password.utf8), as: StoredItems.loginPassword)
     }

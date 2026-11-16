@@ -37,6 +37,10 @@ public final class CameraCapture: NSObject, FrameSource, AVCaptureVideoDataOutpu
         self.warmup = warmup
     }
 
+    /// Session de capture, pour l'aperçu affiché pendant l'enrôlement (image en direct,
+    /// jamais enregistrée).
+    public var captureSession: AVCaptureSession { session }
+
     public func start() throws {
         sessionLock.lock()
         defer { sessionLock.unlock() }

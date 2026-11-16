@@ -27,7 +27,7 @@ let package = Package(
         // Application (barre des menus, réglages) — Swift 6 strict.
         .executableTarget(
             name: "NoyaFace",
-            dependencies: ["NoyaCore"]
+            dependencies: ["NoyaCore", "NoyaEngine"]
         ),
         .testTarget(
             name: "NoyaCoreTests",
