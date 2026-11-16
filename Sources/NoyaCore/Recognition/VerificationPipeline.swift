@@ -8,15 +8,16 @@ public enum VerificationPipelineError: Error, Equatable {
 }
 
 public struct PipelineConfig {
-    /// Cosine similarity between a frame's L2-normalized aligned ArcFace embedding and the
-    /// enrolled (normalized) centroid. Aligned w600k_mbf scores the same person well above
-    /// 0.5 and different people well below 0.3; ohmylock ships 0.62 for the same model.
+    /// Similarité cosinus minimale entre l'empreinte SFace d'une image et le centroïde enrôlé.
+    /// Valeur **provisoire** : OpenCV publie 0,363 comme seuil de même identité pour SFace
+    /// (mesuré sur LFW) ; NOYA Face part plus haut par prudence. Le seuil définitif sera fixé
+    /// par mesure sur Mac (docs/tests/PROTOCOLE-RECONNAISSANCE.md).
     public let matchThreshold: Float
     /// Minimum anti-spoof probability for the live class, on top of live being the argmax.
     /// Real webcam faces score ~0.99; upstream's print/replay samples score ≤0.002.
     public let livenessThreshold: Float
 
-    public init(matchThreshold: Float = 0.5, livenessThreshold: Float = 0.6) {
+    public init(matchThreshold: Float = 0.42, livenessThreshold: Float = 0.6) {
         self.matchThreshold = matchThreshold
         self.livenessThreshold = livenessThreshold
     }

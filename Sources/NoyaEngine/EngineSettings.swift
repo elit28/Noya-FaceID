@@ -3,11 +3,13 @@ import Foundation
 public enum MatchStrictness: String, CaseIterable, Sendable {
     case relaxed, normal, strict
 
+    /// Seuils provisoires pour SFace (référence OpenCV : 0,363), à recalibrer par mesure
+    /// sur Mac selon docs/tests/PROTOCOLE-RECONNAISSANCE.md.
     public var threshold: Float {
         switch self {
-        case .relaxed: return 0.45
-        case .normal: return 0.5
-        case .strict: return 0.6
+        case .relaxed: return 0.38
+        case .normal: return 0.42
+        case .strict: return 0.48
         }
     }
 

@@ -12,14 +12,16 @@ public protocol FaceEmbedding_Provider {
     func embedding(for face: DetectedFace, in frame: RGBAImage) throws -> FaceEmbedding
 }
 
-/// Extracteur d'empreinte faciale. Charge le modèle Core ML `FaceRecognition.mlpkgdata`
-/// depuis les ressources de NoyaCore.
+/// Extracteur d'empreinte faciale : modèle SFace (OpenCV Zoo, Apache-2.0), converti en
+/// Core ML par `scripts/convert_sface.py` et embarqué sous `FaceRecognition.mlpkgdata`.
+///
+/// Entrée : visage aligné en RVB 112 × 112 (valeurs 0-255) sur les 5 points de repère du
+/// gabarit standard (voir `FaceGeometry`) ; la normalisation est intégrée au modèle.
+/// Sortie : 128 valeurs, normalisées ici (norme L2 = 1).
 ///
 /// NOYA Face n'embarque **aucun** modèle InsightFace/ArcFace (licence non commerciale).
-/// Le modèle retenu (SFace, Apache-2.0, en évaluation) est ajouté au jalon J2 ; d'ici là,
-/// `init()` lève `FaceEmbedderError.modelLoadFailed`. L'entrée attendue reste un visage
-/// aligné 112×112 sur les 5 points de repère du gabarit standard (voir `FaceGeometry`) ;
-/// la normalisation exacte du modèle sera vérifiée au jalon J2.
+/// Si le modèle est absent, `init()` lève `FaceEmbedderError.modelLoadFailed` : aucun repli
+/// silencieux vers un extracteur moins fiable.
 public final class FaceEmbedder: FaceEmbedding_Provider {
     /// Nom de la ressource du modèle de reconnaissance (sans extension).
     public static let modelName = "FaceRecognition"
@@ -42,8 +44,13 @@ public final class FaceEmbedder: FaceEmbedding_Provider {
 
     public func embedding(for face: DetectedFace, in frame: RGBAImage) throws -> FaceEmbedding {
         guard face.landmarks.count == 5 else { throw FaceEmbedderError.noFaceDetected }
-        let aligned = FaceGeometry.alignedFace(in: frame, landmarks: face.landmarks)
-        guard let pixelBuffer = aligned.makePixelBuffer(),
+        return try embedding(forAligned: FaceGeometry.alignedFace(in: frame, landmarks: face.landmarks))
+    }
+
+    /// Empreinte d'un visage déjà aligné (112 × 112). Sert aussi aux tests de fidélité du modèle.
+    func embedding(forAligned aligned: RGBAImage) throws -> FaceEmbedding {
+        guard aligned.width == 112, aligned.height == 112,
+              let pixelBuffer = aligned.makePixelBuffer(),
               let provider = try? MLDictionaryFeatureProvider(dictionary: [inputName: MLFeatureValue(pixelBuffer: pixelBuffer)]),
               let output = try? model.prediction(from: provider),
               let multiArray = output.featureValue(for: outputName)?.multiArrayValue

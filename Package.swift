@@ -16,6 +16,7 @@ let package = Package(
             name: "NoyaCore",
             resources: [
                 .copy("Resources/AntiSpoof.mlpkgdata"),
+                .copy("Resources/FaceRecognition.mlpkgdata"),
             ]
         ),
         // Moteur : caméra, enrôlement, vérification, protection d'applications.

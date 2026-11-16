@@ -26,10 +26,16 @@ NOYA Face est distribué sous licence MIT (voir `LICENSE`). Il intègre ou s'app
   - trois images d'exemple, non modifiées, utilisées comme références de test : `Tests/NoyaCoreTests/Fixtures` (voir `NOTICE.txt`).
 - Remarque : le dépôt d'origine est sous Apache-2.0 et ne précise pas de licence distincte pour les poids du modèle.
 
+### SFace (modèle de reconnaissance)
+
+- Auteurs : Yaoyao Zhong (SFace) ; conversion ONNX : OpenCV Zoo (Chengrui Wang) — licence **Apache-2.0** (`LICENSES/Apache-2.0.txt`)
+- Source : <https://github.com/opencv/opencv_zoo/tree/main/models/face_recognition_sface>, fichier `face_recognition_sface_2021dec.onnx` (SHA-256 `0ba9fbfa01b5270c96627c4ef784da859931e02f04419c829e83484087c34e79`)
+- Repris : converti en Core ML (précision FP16) par `scripts/convert_sface.py` → `Sources/NoyaCore/Resources/FaceRecognition.mlpkgdata`. Sortie de référence du modèle d'origine pour les tests : `Tests/NoyaCoreTests/Fixtures/sface_reference.json`.
+- Remarque : OpenCV Zoo place tous les fichiers de ce répertoire sous Apache-2.0 ; le jeu de données d'entraînement n'y est pas précisé.
+
 ## Prévus — Planned (not included yet)
 
 - **Glance** — Jonathan Zhou — MIT — <https://github.com/jonnyoo/glance> : portage prévu de la détection de présence réelle multi-indices et des profils. Rien n'est encore inclus.
-- **SFace** (OpenCV Zoo) — Apache-2.0 — <https://github.com/opencv/opencv_zoo> : modèle de reconnaissance en évaluation (jalon J2). Rien n'est encore inclus.
 
 ## Exclus — Deliberately excluded
 

@@ -7,6 +7,10 @@ import Testing
     #expect(ModelResources.url(named: "ArcFace") == nil, "ArcFace (licence non commerciale) ne doit jamais être embarqué")
 }
 
+@Test func faceRecognitionModelResourceExists() {
+    #expect(ModelResources.url(named: FaceEmbedder.modelName) != nil, "FaceRecognition.mlpkgdata (SFace) doit être embarqué")
+}
+
 @Test func antiSpoofModelResourceExists() {
     let url = ModelResources.url(named: "AntiSpoof")
     #expect(url != nil, "AntiSpoof.mlpkgdata should be bundled as a resource")

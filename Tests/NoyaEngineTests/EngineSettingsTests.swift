@@ -10,7 +10,7 @@ import Foundation
     settings.lockScreenEnabled = true
     settings.strictness = .strict
     settings.launchAtLogin = false
-    #expect(settings.strictness.threshold == 0.6)
+    #expect(settings.strictness.threshold == MatchStrictness.strict.threshold)
 
     settings.resetAll()
     #expect(settings.setupComplete == false)
