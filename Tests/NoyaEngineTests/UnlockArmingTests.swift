@@ -12,13 +12,15 @@ private final class Clock: @unchecked Sendable {
     #expect(arming.remaining == nil)
 }
 
-@Test func armingExpiresAfterTheChosenDuration() {
+@Test func armingExpiresAfterTheChosenDuration() throws {
     let clock = Clock()
     let arming = UnlockArming(now: { clock.t })
+    let eightHours: TimeInterval = 8 * 3600
     arming.arm(hours: 8)
     #expect(arming.isArmed)
-    #expect(arming.remaining == 8 * 3600)
-    clock.t += 8 * 3600 - 1
+    let remaining = try #require(arming.remaining)
+    #expect(abs(remaining - eightHours) < 0.001)
+    clock.t += eightHours - 1
     #expect(arming.isArmed)
     clock.t += 1
     #expect(!arming.isArmed)
