@@ -1,0 +1,56 @@
+name: Publication
+
+# Lancée à la main (onglet Actions › Publication › Run workflow) depuis la branche principale :
+# compile, teste, construit l'app universelle et publie une version GitHub avec l'archive.
+# Sans compte Apple Developer, l'app n'est ni signée par une équipe ni notarisée.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Numéro de version (ex. 0.9.0)"
+        required: true
+        default: "0.9.0"
+      prerelease:
+        description: "Pré-version (bêta)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  publication:
+    name: Construction et publication (macOS)
+    runs-on: macos-15-intel
+    timeout-minutes: 45
+    env:
+      VERSION: ${{ inputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Notes de version présentes
+        run: test -f "docs/release-notes/${VERSION}.md"
+      - name: Compilation
+        run: swift build
+      - name: Tests
+        run: swift test
+      - name: Construction de l’app universelle (signature ad hoc, Hardened Runtime)
+        env:
+          NOYA_UNIVERSAL: "1"
+        run: scripts/build-app.sh "$VERSION" "${{ github.run_number }}"
+      - name: Archive et empreinte SHA-256
+        run: |
+          ditto -c -k --keepParent "dist/NOYA Face.app" "dist/NOYA-Face-${VERSION}.zip"
+          (cd dist && shasum -a 256 "NOYA-Face-${VERSION}.zip" > "NOYA-Face-${VERSION}.zip.sha256")
+          cat "dist/NOYA-Face-${VERSION}.zip.sha256"
+      - name: Publication de la version GitHub
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PRERELEASE: ${{ inputs.prerelease }}
+        run: |
+          FLAGS=""
+          TITLE="NOYA Face ${VERSION}"
+          if [ "$PRERELEASE" = "true" ]; then FLAGS="--prerelease"; TITLE="${TITLE} (bêta)"; fi
+          gh release create "v${VERSION}" \
+            "dist/NOYA-Face-${VERSION}.zip" "dist/NOYA-Face-${VERSION}.zip.sha256" \
+            --target "$GITHUB_SHA" --title "$TITLE" \
+            --notes-file "docs/release-notes/${VERSION}.md" $FLAGS

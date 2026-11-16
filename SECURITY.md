@@ -8,7 +8,7 @@
 
 ## État actuel
 
-Version de développement : la protection d'applications et le verrouillage en cas d'absence sont écrits, compilés et testés automatiquement sur macOS, mais **pas encore essayés ni mesurés sur un vrai Mac**. Les garanties ci-dessous décrivent les objectifs et les règles du projet ; elles seront vérifiées et mesurées à chaque jalon (voir `docs/audit/AUDIT-TECHNIQUE.md`).
+Version bêta 0.9.0 : les fonctions sont compilées et testées automatiquement sur macOS et ont fonctionné lors des premiers essais sur un Mac, mais la résistance aux photos et vidéos, les seuils de reconnaissance et la consommation **ne sont pas encore mesurés**. Les garanties ci-dessous décrivent les objectifs et les règles du projet ; elles seront vérifiées et mesurées à chaque jalon (voir `docs/audit/AUDIT-TECHNIQUE.md`).
 
 ## Ce que NOYA Face protège — et ce qu'il ne protège pas
 

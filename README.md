@@ -12,7 +12,7 @@
 </div>
 
 > [!WARNING]
-> **En développement — aucune version publiée.** L'assistant de configuration, la protection d'applications, le verrouillage en cas d'absence et le déverrouillage de l'écran (mode avancé) sont écrits, compilés et testés automatiquement sur macOS (CI), mais **pas encore essayés sur un vrai Mac**.
+> **Version bêta (0.9.0).** Toutes les fonctions sont compilées et testées automatiquement sur macOS (CI) et ont fonctionné lors des premiers essais sur un Mac. **Pas encore mesurés** : la résistance aux photos et vidéos, les seuils de reconnaissance et la consommation — objet de la version 1.0.
 >
 > **La caméra d'un Mac n'est pas Face ID.** Elle ne mesure pas la profondeur du visage. NOYA Face apportera confort et confidentialité, mais ne remplace pas un mot de passe macOS robuste.
 
@@ -30,9 +30,14 @@
 
 Traitement entièrement local, aucune image enregistrée, aucune donnée envoyée, aucun compte, aucune télémétrie. Détails : [`SECURITY.md`](SECURITY.md).
 
-### Essayer la version de développement
+### Télécharger
 
-Chaque modification produit une app de test dans l'onglet [Actions](https://github.com/elit28/Noya-FaceID/actions) (archive « NOYA-Face-dev »). Elle n'est pas notarisée : au premier lancement, macOS la bloque. Ouvrez alors **Réglages Système › Confidentialité et sécurité** et cliquez sur **Ouvrir quand même**.
+Dernière version : onglet [Releases](https://github.com/elit28/Noya-FaceID/releases) — archive `NOYA-Face-<version>.zip`, macOS 14 ou plus récent, Mac Apple Silicon ou Intel.
+
+1. Ouvrez l'archive et glissez **NOYA Face** dans **Applications**.
+2. Au premier lancement, macOS bloque l'app (elle n'est pas notarisée, faute de compte Apple Developer) : **Réglages Système › Confidentialité et sécurité › Ouvrir quand même**. Ne retirez jamais l'attribut de quarantaine à la main.
+
+Chaque modification produit aussi une app de test dans l'onglet [Actions](https://github.com/elit28/Noya-FaceID/actions) (archive « NOYA-Face-dev »).
 
 ### Compiler
 
@@ -54,7 +59,7 @@ Plus de détails : [`CONTRIBUTING.md`](CONTRIBUTING.md) · architecture : [`docs
 
 ## English
 
-NOYA Face protects selected apps behind your face (with Touch ID or your macOS password as fallback, verified by macOS), locks your Mac when you walk away and, as an opt-in advanced mode, types your macOS password on the lock screen when your face is recognized (not a Face ID authentication); recognition steps around the notch are coming. Everything runs on-device: no images stored, no data sent, no account, no telemetry. **A Mac webcam is not Face ID** — NOYA Face is a convenience and privacy layer, not a replacement for a strong password. Development version: setup assistant, app protection, away lock and screen unlock are built and tested automatically on macOS (CI) but not yet tried on a real Mac; nothing is released yet. Build with `swift build`, test with `swift test`, package with `scripts/build-app.sh` (macOS 14+, Xcode 16+).
+NOYA Face protects selected apps behind your face (with Touch ID or your macOS password as fallback, verified by macOS), locks your Mac when you walk away and, as an opt-in advanced mode, types your macOS password on the lock screen when your face is recognized (not a Face ID authentication); recognition steps around the notch are coming. Everything runs on-device: no images stored, no data sent, no account, no telemetry. **A Mac webcam is not Face ID** — NOYA Face is a convenience and privacy layer, not a replacement for a strong password. Beta 0.9.0: every feature is built and tested automatically on macOS (CI) and worked in first trials on a Mac; resistance to photos and videos, recognition thresholds and power use are not measured yet. Build with `swift build`, test with `swift test`, package with `scripts/build-app.sh` (macOS 14+, Xcode 16+).
 
 ## Licence — License
 
