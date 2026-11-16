@@ -42,3 +42,10 @@ private func makeStore() -> LockedAppStore {
     store.remove(bundleID: "com.apple.Notes")
     #expect(store.apps.isEmpty)
 }
+
+@Test func untilQuitPolicyRoundTrips() {
+    let defaults = UserDefaults(suiteName: "until-quit-\(UUID().uuidString)")!
+    let store = LockedAppStore(defaults: defaults)
+    store.add(bundleID: "com.apple.Notes", name: "Notes", policy: .untilQuit)
+    #expect(LockedAppStore(defaults: defaults).app("com.apple.Notes")?.policy == .untilQuit)
+}

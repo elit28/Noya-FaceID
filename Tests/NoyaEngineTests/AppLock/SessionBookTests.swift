@@ -62,3 +62,14 @@ private func makeBook() -> (SessionBook, Clock) {
     book.revokeAll()
     #expect(!book.isUnlocked("b"))
 }
+
+@Test func untilQuitSurvivesFocusLossUntilRevoked() {
+    let (book, clock) = makeBook()
+    book.unlock("a", policy: .untilQuit)
+    book.focusLost("a")
+    clock.advance(minutes: 240)
+    book.focusGained("a")
+    #expect(book.isUnlocked("a"))
+    book.revoke("a") // l'app a été quittée
+    #expect(!book.isUnlocked("a"))
+}

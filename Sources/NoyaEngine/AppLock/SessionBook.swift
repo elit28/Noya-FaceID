@@ -42,7 +42,7 @@ public final class SessionBook: @unchecked Sendable {
         case .afterFocusLossMinutes(let minutes):
             session.expiry = now() + Double(minutes) * 60
             sessions[bundleID] = session
-        case .afterMinutes:
+        case .afterMinutes, .untilQuit:
             break
         }
     }

@@ -511,7 +511,9 @@ flowchart LR
 | Jalon | État | Preuve attendue |
 |---|---|---|
 | J3 Maquettes | **Validées** | Canevas de maquettes validé par le propriétaire |
-| J1 Socle | Poussé, CI Linux verte, **CI macOS en attente de machine** | Compilation, tests et construction de l'app verts sur macOS |
-| J2 Modèle | SFace téléchargé (SHA-256 vérifié), converti en Core ML (`scripts/convert_sface.py`, fidélité ONNX → PyTorch : cosinus 1,000000), intégré ; seuils provisoires | Test de fidélité Core ML vert sur macOS ; mesures sur le Mac selon `docs/tests/PROTOCOLE-RECONNAISSANCE.md` |
-| J4 Reconnaissance | Profil « un visage, plusieurs apparences », refus multi-visages et visage trop loin, durée de recherche et distance réglables, tests unitaires | Tests verts sur macOS ; protocole manuel sur le Mac |
-| Swift 6 | Moteur migré en mode strict | Compilation verte sur macOS |
+| J1 Socle | **Vérifié sur macOS** : run CI 43923798785 (commit 2676021, macOS 15.7.9, Xcode 16.4) : compilation, 111 tests réussis (1 ignoré comme prévu), app universelle x86_64 + arm64 construite et vérifiée (signature ad hoc, Hardened Runtime, droit caméra seul) | — |
+| J2 Modèle | SFace téléchargé (SHA-256 vérifié), converti en Core ML (`scripts/convert_sface.py`, fidélité ONNX → PyTorch : cosinus 1,000000), intégré. **Test de fidélité Core ML vert sur macOS** (run 43923798785). Seuils provisoires | Mesures sur le Mac selon `docs/tests/PROTOCOLE-RECONNAISSANCE.md` |
+| J4 Reconnaissance | Profil « un visage, plusieurs apparences », refus multi-visages et visage trop loin, durée de recherche et distance réglables. **Tests unitaires verts sur macOS** (run 43923798785) | Protocole manuel sur le Mac |
+| Assistant de configuration | Autorisations réelles (caméra, Accessibilité, ouverture à la session), enregistrement du visage en deux tours avec aperçu et anneau, FR/EN. **Compilation et tests verts sur macOS** (run 43925235451, commit 92fd171) | Essai sur le Mac |
+| J7 Protection d'apps | Bouclier plein écran par écran (opaque par défaut, flou en option), app protégée masquée dès l'épisode et à chaque retour au premier plan, visage puis Touch ID ou mot de passe à la demande, règles de reverrouillage (à chaque ouverture, 5 ou 15 min, à la fermeture de l'app), reverrouillage à la veille, sélecteur d'apps | Compilation verte sur macOS ; tests ⌘⇥, captures, Mission Control, multi-écran, arrêt forcé sur le Mac |
+| Swift 6 | Moteur et app en mode strict. **Compilation verte sur macOS** (run 43923798785) | — |

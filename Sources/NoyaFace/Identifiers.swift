@@ -34,6 +34,36 @@ enum SystemKeys {
 
 /// Préférences des fonctions choisies dans l'assistant.
 enum FeatureKeys {
-    static let appProtection = "feature.appProtection"
+    /// Même clé que `LockedAppStore.enabled` : l'assistant active directement la protection.
+    static let appProtection = "appLock.enabled"
     static let awayLock = "feature.awayLock"
+}
+
+/// Préférences de la protection d'applications.
+enum AppLockKeys {
+    /// Aspect du bouclier : `ShieldMask`.
+    static let mask = "appLock.mask"
+    /// Reverrouiller toutes les apps à la mise en veille et au verrouillage du Mac.
+    static let relockOnSleep = "appLock.relockOnSleep"
+
+    /// Suggestions du sélecteur : Messages, Notes, Photos, Mail.
+    static let suggestedBundleIDs = ["com.apple.MobileSMS", "com.apple.Notes", "com.apple.Photos", "com.apple.mail"]
+    /// Dossier proposé par « Autre application… ».
+    static let applicationsFolder = "/Applications"
+
+    static var isRelockOnSleepEnabled: Bool {
+        UserDefaults.standard.object(forKey: relockOnSleep) as? Bool ?? true
+    }
+}
+
+/// Aspect du bouclier. Opaque par défaut : rien de l'app n'est visible.
+enum ShieldMask: String, CaseIterable {
+    case opaque
+    case blur
+}
+
+/// Notification système non documentée, émise au verrouillage de l'écran. Une imitation
+/// ne peut que reverrouiller les apps : aucun risque à l'écouter.
+enum SystemNotifications {
+    static let screenIsLocked = "com.apple.screenIsLocked"
 }

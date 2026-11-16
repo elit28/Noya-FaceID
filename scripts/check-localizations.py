@@ -39,6 +39,18 @@ def load_table(path):
     return entries
 
 
+INTERPOLATION = re.compile(r"\\\([^)]*\)")
+
+
+def localization_keys(text):
+    """Clés possibles d'un texte : chaque interpolation \\(…) devient %@ ou %lld."""
+    parts = INTERPOLATION.split(text)
+    candidates = [parts[0]]
+    for part in parts[1:]:
+        candidates = [c + spec + part for c in candidates for spec in ("%@", "%lld")]
+    return candidates
+
+
 def main():
     errors = []
     tables = {}
@@ -74,7 +86,7 @@ def main():
                 before = line[:match.start()]
                 if not text or before.endswith(NON_LOCALIZED_CONTEXTS):
                     continue
-                if text not in keys:
+                if not any(candidate in keys for candidate in localization_keys(text)):
                     errors.append(f"{source.relative_to(ROOT)}:{number}: texte non traduit « {text} »")
 
     if errors:

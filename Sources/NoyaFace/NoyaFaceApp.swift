@@ -24,9 +24,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         if !AppModel.shared.onboardingComplete {
             OnboardingWindowController.shared.show()
-        } else if !PreferenceKeys.isMenuBarIconVisible {
+            return
+        }
+        if !PreferenceKeys.isMenuBarIconVisible {
             // Icône masquée : sans fenêtre, l'utilisateur n'aurait aucun moyen d'atteindre les réglages.
             SettingsWindowController.shared.show()
+        }
+        AppLockController.shared.refresh()
+        if AppLockController.shared.isRunning {
+            // Préchargement des modèles : la première app protégée s'ouvre sans attente.
+            Task { _ = await AppModel.shared.loadRuntime() }
         }
     }
 

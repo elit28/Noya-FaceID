@@ -14,6 +14,7 @@ NOYA Face est distribué sous licence MIT (voir `LICENSE`). Il intègre ou s'app
   - `Sources/NoyaCore` (ex-`HeyMacCore`) : alignement du visage, pipeline de vérification, classifieur anti-usurpation, stockage chiffré, état du verrouillage ;
   - `Sources/NoyaEngine` (ex-`HeyMacEngine`) : caméra, enrôlement, vérification, protection d'applications ;
   - les tests correspondants (`Tests/NoyaCoreTests`, `Tests/NoyaEngineTests`) ;
+  - adaptés de `HeyMacApp/AppLock` : `Sources/NoyaFace/AppLock/AppWatcher.swift`, `ShieldController.swift` et `AppLockController.swift` (masquage immédiat de l'app protégée, reprise du premier plan, mode plein écran seul, masque opaque par défaut) ;
   - `scripts/create-signing-identity.sh`, et la base de `scripts/build-app.sh`, `scripts/lib-signing.sh` et `scripts/verify-app.sh`.
 - Modifications principales : renommage, retrait du modèle ArcFace (licence), appel direct de `CGSessionCopyCurrentDictionary` sans chargement dynamique de symbole, signature avec Hardened Runtime, traduction des scripts.
 

@@ -77,7 +77,13 @@ struct OnboardingView: View {
         case .done:
             Button("Terminer") {
                 AppModel.shared.completeOnboarding()
+                AppLockController.shared.store.enabled = appProtection
+                AppLockController.shared.refresh()
                 onFinish()
+                if appProtection && AppLockController.shared.store.apps.isEmpty {
+                    // Étape suivante naturelle : choisir les apps à protéger.
+                    SettingsWindowController.shared.show()
+                }
             }
             .buttonStyle(.borderedProminent).controlSize(.large).keyboardShortcut(.defaultAction)
         default:
@@ -328,7 +334,7 @@ private struct DoneStep: View {
             Form {
                 LabeledContent("Mon visage") { StatusBadge(text: "Enregistré · 2 scans", positive: true) }
                 LabeledContent("Applications protégées") {
-                    StatusBadge(text: appProtection ? "Arrive dans une prochaine version" : "Désactivé", positive: false)
+                    StatusBadge(text: appProtection ? "À choisir dans les réglages" : "Désactivé", positive: appProtection)
                 }
                 LabeledContent("Verrouillage quand vous vous éloignez") {
                     StatusBadge(text: awayLock ? "Arrive dans une prochaine version" : "Désactivé", positive: false)

@@ -1,12 +1,14 @@
 import Foundation
 
-public enum RelockPolicy: Codable, Equatable, Sendable {
+public enum RelockPolicy: Codable, Hashable, Sendable {
     /// Locked again as soon as the app loses focus.
     case everyTime
     /// Locked N minutes after unlocking, regardless of focus.
     case afterMinutes(Int)
     /// Locked N minutes after the app loses focus; returning sooner keeps it unlocked.
     case afterFocusLossMinutes(Int)
+    /// Locked again only when the app quits (and at sleep or screen lock).
+    case untilQuit
 }
 
 public struct LockedApp: Codable, Equatable, Sendable, Identifiable {

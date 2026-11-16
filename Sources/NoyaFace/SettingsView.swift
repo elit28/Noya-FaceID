@@ -24,9 +24,11 @@ struct SettingsView: View {
                         .foregroundStyle(.secondary)
                     }
                 }
-                Text("Socle de développement : les fonctions de protection arrivent dans les prochains jalons.")
+                Text("Version de développement : d’autres fonctions arrivent dans les prochains jalons.")
                     .foregroundStyle(.secondary)
             }
+
+            ProtectedAppsSection()
 
             Section("Barre des menus") {
                 Toggle("Afficher l’icône dans la barre des menus", isOn: $menuBarIconVisible)
