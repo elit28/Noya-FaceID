@@ -165,7 +165,7 @@ private struct WelcomeStep: View {
                 .multilineTextAlignment(.center)
                 .padding(.top, 6)
             HStack(alignment: .top, spacing: 18) {
-                Feature(symbol: "lock", title: "Entièrement local", detail: "Aucune image enregistrée, aucune connexion à Internet.")
+                Feature(symbol: "lock", title: "Entièrement local", detail: "Aucune image enregistrée, aucune donnée envoyée.")
                 Feature(symbol: "square.grid.2x2", title: "Applications protégées", detail: "Votre visage, puis Touch ID ou votre mot de passe.")
                 Feature(symbol: "figure.walk", title: "Verrouillage auto", detail: "Le Mac se verrouille quand vous vous éloignez.")
             }

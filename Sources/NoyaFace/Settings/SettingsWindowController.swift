@@ -14,8 +14,7 @@ final class SettingsWindowController {
     func show() {
         let window = self.window ?? makeWindow()
         self.window = window
-        NSApplication.shared.activate()
-        window.makeKeyAndOrderFront(nil)
+        AppPresence.present(window)
     }
 
     private func makeWindow() -> NSWindow {

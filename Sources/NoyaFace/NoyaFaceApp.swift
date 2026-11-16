@@ -32,6 +32,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         AppLockController.shared.refresh()
         AwayLockController.shared.refresh()
+        Task { await UpdateChecker.shared.checkIfDue() }
         if AppLockController.shared.isRunning || AwayLockController.shared.isEnabled || ScreenUnlockController.shared.isEnabled {
             // Préchargement des modèles : la première vérification se fait sans attente.
             Task {

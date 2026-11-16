@@ -1,5 +1,4 @@
 /* Interface de NOYA Face — français (langue de développement). Clé = texte français. */
-"Version de développement" = "Version de développement";
 "Réglages…" = "Réglages…";
 "Masquer l’icône de la barre des menus" = "Masquer l’icône de la barre des menus";
 "Quitter NOYA Face" = "Quitter NOYA Face";
@@ -72,7 +71,6 @@
 "Bienvenue dans NOYA Face" = "Bienvenue dans NOYA Face";
 "Protégez vos applications et votre Mac avec votre visage. Tout reste sur ce Mac." = "Protégez vos applications et votre Mac avec votre visage. Tout reste sur ce Mac.";
 "Entièrement local" = "Entièrement local";
-"Aucune image enregistrée, aucune connexion à Internet." = "Aucune image enregistrée, aucune connexion à Internet.";
 "Applications protégées" = "Applications protégées";
 "Votre visage, puis Touch ID ou votre mot de passe." = "Votre visage, puis Touch ID ou votre mot de passe.";
 "Verrouillage auto" = "Verrouillage auto";
@@ -328,3 +326,58 @@
 "Paramètres avancés" = "Paramètres avancés";
 "Diagnostic" = "Diagnostic";
 "À propos" = "À propos";
+
+/* Mises à jour, désinstallation */
+"Aucune image enregistrée, aucune donnée envoyée." = "Aucune image enregistrée, aucune donnée envoyée.";
+"Mises à jour" = "Mises à jour";
+"Rechercher les mises à jour automatiquement" = "Rechercher les mises à jour automatiquement";
+"Une fois par jour, NOYA Face interroge GitHub pour connaître la dernière version. Aucune autre donnée n’est envoyée. Désactivé par défaut." = "Une fois par jour, NOYA Face interroge GitHub pour connaître la dernière version. Aucune autre donnée n’est envoyée. Désactivé par défaut.";
+"Télécharger" = "Télécharger";
+"Rechercher maintenant" = "Rechercher maintenant";
+"Version installée : %@" = "Version installée : %@";
+"Désinstallation" = "Désinstallation";
+"Désinstaller…" = "Désinstaller…";
+"Désinstaller NOYA Face" = "Désinstaller NOYA Face";
+"Supprime votre visage, le mot de passe enregistré, la clé du trousseau, les réglages et l’app." = "Supprime votre visage, le mot de passe enregistré, la clé du trousseau, les réglages et l’app.";
+"Pas encore recherchée." = "Pas encore recherchée.";
+"NOYA Face est à jour." = "NOYA Face est à jour.";
+"La version %@ est disponible." = "La version %@ est disponible.";
+"Recherche impossible (pas de connexion ?)." = "Recherche impossible (pas de connexion ?).";
+"Voir" = "Voir";
+"Mise à jour" = "Mise à jour";
+"La version %@ de NOYA Face est disponible." = "La version %@ de NOYA Face est disponible.";
+"Votre visage (empreintes chiffrées)" = "Votre visage (empreintes chiffrées)";
+"Mot de passe enregistré et clé du trousseau" = "Mot de passe enregistré et clé du trousseau";
+"Réglages et journaux" = "Réglages et journaux";
+"Ouverture à la connexion" = "Ouverture à la connexion";
+"Autorisations macOS (si possible)" = "Autorisations macOS (si possible)";
+"L’application NOYA Face" = "L’application NOYA Face";
+"macOS n’a pas permis de retirer les autorisations : retirez NOYA Face dans Réglages Système › Confidentialité et sécurité › Caméra et Accessibilité." = "macOS n’a pas permis de retirer les autorisations : retirez NOYA Face dans Réglages Système › Confidentialité et sécurité › Caméra et Accessibilité.";
+"Les autorisations accordées dans Réglages Système sont retirées si macOS le permet ; sinon, NOYA Face vous indique où le faire." = "Les autorisations accordées dans Réglages Système sont retirées si macOS le permet ; sinon, NOYA Face vous indique où le faire.";
+"Désinstaller" = "Désinstaller";
+"Placer dans la Corbeille et quitter" = "Placer dans la Corbeille et quitter";
+"Désinstaller NOYA Face ?" = "Désinstaller NOYA Face ?";
+"Suppression en cours…" = "Suppression en cours…";
+"Données supprimées" = "Données supprimées";
+"Tout ce qui suit sera supprimé de ce Mac. Confirmation par Touch ID ou votre mot de passe macOS." = "Tout ce qui suit sera supprimé de ce Mac. Confirmation par Touch ID ou votre mot de passe macOS.";
+"Authentification annulée : rien n’a été supprimé." = "Authentification annulée : rien n’a été supprimé.";
+"Ne fermez pas cette fenêtre." = "Ne fermez pas cette fenêtre.";
+"Il reste à placer l’application dans la Corbeille. NOYA Face se fermera ensuite." = "Il reste à placer l’application dans la Corbeille. NOYA Face se fermera ensuite.";
+"Supprimé" = "Supprimé";
+"À la Corbeille" = "À la Corbeille";
+"désinstaller NOYA Face et supprimer vos données" = "désinstaller NOYA Face et supprimer vos données";
+
+/* Menus de l’app */
+"À propos de NOYA Face" = "À propos de NOYA Face";
+"Masquer NOYA Face" = "Masquer NOYA Face";
+"Fichier" = "Fichier";
+"Fermer la fenêtre" = "Fermer la fenêtre";
+"Édition" = "Édition";
+"Rétablir" = "Rétablir";
+"Couper" = "Couper";
+"Copier" = "Copier";
+"Coller" = "Coller";
+"Tout sélectionner" = "Tout sélectionner";
+"Fenêtre" = "Fenêtre";
+"Placer dans le Dock" = "Placer dans le Dock";
+"Version %@" = "Version %@";
