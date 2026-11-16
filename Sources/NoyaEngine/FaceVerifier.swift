@@ -34,7 +34,7 @@ public struct VerificationOutcome: Equatable, Sendable {
     }
 }
 
-public protocol FaceMatching: AnyObject {
+public protocol FaceMatching: AnyObject, Sendable {
     func run(timeout: TimeInterval, requiredConsecutive: Int, waitForTurn: TimeInterval,
              keepGoing: () -> Bool) -> VerificationOutcome
 }

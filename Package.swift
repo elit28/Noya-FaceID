@@ -19,12 +19,10 @@ let package = Package(
                 .copy("Resources/FaceRecognition.mlpkgdata"),
             ]
         ),
-        // Moteur : caméra, enrôlement, vérification, protection d'applications.
-        // Encore en mode Swift 5 comme dans HeyMac : migration Swift 6 prévue juste après le socle.
+        // Moteur : caméra, enrôlement, vérification, protection d'applications (Swift 6 strict).
         .target(
             name: "NoyaEngine",
-            dependencies: ["NoyaCore"],
-            swiftSettings: [.swiftLanguageMode(.v5)]
+            dependencies: ["NoyaCore"]
         ),
         // Application (barre des menus, réglages) — Swift 6 strict.
         .executableTarget(
@@ -38,8 +36,7 @@ let package = Package(
         ),
         .testTarget(
             name: "NoyaEngineTests",
-            dependencies: ["NoyaEngine", "NoyaCore"],
-            swiftSettings: [.swiftLanguageMode(.v5)]
+            dependencies: ["NoyaEngine", "NoyaCore"]
         ),
     ]
 )

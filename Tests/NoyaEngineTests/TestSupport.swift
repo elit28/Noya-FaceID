@@ -30,7 +30,7 @@ func matchedOutcome() -> VerificationOutcome {
     return outcome
 }
 
-final class FakeMatcher: FaceMatching {
+final class FakeMatcher: FaceMatching, @unchecked Sendable {
     var outcome = VerificationOutcome()
     var onRun: (() -> Void)?
     private(set) var callCount = 0

@@ -7,7 +7,10 @@ public final class LocalSystemAuth: SystemAuthSource, @unchecked Sendable {
     public init() {}
 
     public func authenticate(reason: String) async -> SystemAuthResult {
-        let context = LAContext()
+        // LAContext n'est pas Sendable : la boîte permet de l'invalider depuis le
+        // gestionnaire d'annulation, seul autre accès concurrent prévu par l'API.
+        let box = ContextBox()
+        let context = box.context
         var error: NSError?
         guard context.canEvaluatePolicy(.deviceOwnerAuthentication, error: &error) else {
             return .failed(error?.localizedDescription ?? "Authentication is unavailable")
@@ -22,7 +25,11 @@ public final class LocalSystemAuth: SystemAuthSource, @unchecked Sendable {
                 return .failed(error.localizedDescription)
             }
         } onCancel: {
-            context.invalidate()
+            box.context.invalidate()
         }
     }
+}
+
+private final class ContextBox: @unchecked Sendable {
+    let context = LAContext()
 }
