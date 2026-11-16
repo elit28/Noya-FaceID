@@ -34,6 +34,8 @@ cp -R "$BIN/NoyaFace_NoyaCore.bundle" "$APP/Contents/Resources/"
 for LOCALE_DIR in "$PACKAGING"/*.lproj; do
     cp -R "$LOCALE_DIR" "$APP/Contents/Resources/"
 done
+# Silhouette du N (icône de la barre des menus).
+cp "$PACKAGING/brand/BrandN.png" "$APP/Contents/Resources/BrandN.png"
 cp "$REPO_ROOT/LICENSE" "$REPO_ROOT/THIRD_PARTY_NOTICES.md" "$APP/Contents/Resources/"
 cp "$REPO_ROOT"/LICENSES/* "$APP/Contents/Resources/LICENSES/"
 sed -e "s/__VERSION__/$VERSION/g" -e "s/__BUILD__/$BUILD/g" "$PACKAGING/Info.plist" > "$APP/Contents/Info.plist"

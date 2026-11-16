@@ -34,6 +34,10 @@ NOYA Face est distribué sous licence MIT (voir `LICENSE`). Il intègre ou s'app
 - Repris : converti en Core ML (précision FP16) par `scripts/convert_sface.py` → `Sources/NoyaCore/Resources/FaceRecognition.mlpkgdata`. Sortie de référence du modèle d'origine pour les tests : `Tests/NoyaCoreTests/Fixtures/sface_reference.json`.
 - Remarque : OpenCV Zoo place tous les fichiers de ce répertoire sous Apache-2.0 ; le jeu de données d'entraînement n'y est pas précisé.
 
+### Logo NOYA
+
+- Le « N » de `packaging/brand/noya-n.png` (et les images qui en dérivent : `packaging/AppIcon.png`, `packaging/brand/BrandN.png`) est le logo de NOYA 360 (<https://noya360.fr>). C'est une marque : **il n'est pas couvert par la licence MIT**. Une version dérivée du projet doit utiliser son propre logo.
+
 ## Prévus — Planned (not included yet)
 
 - **Glance** — Jonathan Zhou — MIT — <https://github.com/jonnyoo/glance> : portage prévu de la détection de présence réelle multi-indices et des profils. Rien n'est encore inclus.

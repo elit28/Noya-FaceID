@@ -1,22 +1,43 @@
 import AppKit
 
-/// Logo NOYA Face dessiné par le code : le cadre façon Face ID et un « N ».
-/// Géométrie exprimée dans une grille de 32 unités, identique à la maquette validée.
+/// Logo NOYA Face : le « N » de NOYA 360 dans un cadre façon Face ID.
+/// Les images viennent de `packaging/brand` (scripts/generate-app-icon.py) ; à défaut (lancement
+/// hors de l'app assemblée), un tracé de secours est dessiné par le code dans une grille de
+/// 32 unités.
 enum BrandMark {
+    /// Silhouette du N (seule sa transparence compte), copiée dans Contents/Resources.
+    private static let letterImageName = "BrandN" // noloc
+
     /// Icône de la barre des menus : image modèle (template) qui suit le thème de macOS.
     static func menuBarImage() -> NSImage {
         let size: CGFloat = 18
+        let letter = NSImage(named: letterImageName)
         let image = NSImage(size: NSSize(width: size, height: size), flipped: true) { rect in
-            drawGlyph(in: rect, gridOrigin: 6, gridSize: 20, color: .black)
+            if let letter {
+                drawFrame(in: rect, gridOrigin: 6, gridSize: 20, color: .black)
+                // Le N occupe le centre du cadre (unités 11 à 21 de la grille).
+                let unit = rect.width / 20
+                let width = 11.5 * unit
+                let height = width * letter.size.height / max(letter.size.width, 1)
+                let box = NSRect(x: rect.midX - width / 2, y: rect.midY - height / 2, width: width, height: height)
+                letter.draw(in: box, from: .zero, operation: .sourceOver, fraction: 1, respectFlipped: true, hints: nil)
+            } else {
+                drawGlyph(in: rect, gridOrigin: 6, gridSize: 20, color: .black)
+            }
             return true
         }
         image.isTemplate = true
         return image
     }
 
-    /// Icône de l'application (fond noir arrondi, tracé blanc), pour l'affichage dans l'app.
+    /// Icône de l'application, pour l'affichage dans l'app.
     static func appIconImage(size: CGFloat) -> NSImage {
-        NSImage(size: NSSize(width: size, height: size), flipped: true) { rect in
+        if Bundle.main.object(forInfoDictionaryKey: "CFBundleIconFile") != nil, // noloc
+           let icon = NSImage(named: NSImage.applicationIconName)?.copy() as? NSImage {
+            icon.size = NSSize(width: size, height: size)
+            return icon
+        }
+        return NSImage(size: NSSize(width: size, height: size), flipped: true) { rect in
             let radius = rect.width * 8 / 32
             let background = NSBezierPath(roundedRect: rect.insetBy(dx: 0.5, dy: 0.5), xRadius: radius, yRadius: radius)
             NSColor(srgbRed: 0x14 / 255, green: 0x14 / 255, blue: 0x16 / 255, alpha: 1).setFill()
@@ -29,9 +50,14 @@ enum BrandMark {
         }
     }
 
+    private static func drawFrame(in rect: NSRect, gridOrigin: CGFloat, gridSize: CGFloat, color: NSColor) {
+        drawGlyph(in: rect, gridOrigin: gridOrigin, gridSize: gridSize, color: color, includeLetter: false)
+    }
+
     /// Trace le cadre et le « N ». `gridOrigin`/`gridSize` choisissent la portion de la grille
     /// de 32 unités affichée dans `rect` (repère retourné : y vers le bas).
-    private static func drawGlyph(in rect: NSRect, gridOrigin: CGFloat, gridSize: CGFloat, color: NSColor) {
+    private static func drawGlyph(in rect: NSRect, gridOrigin: CGFloat, gridSize: CGFloat, color: NSColor,
+                                  includeLetter: Bool = true) {
         let scale = rect.width / gridSize
         func point(_ x: CGFloat, _ y: CGFloat) -> NSPoint {
             NSPoint(x: rect.minX + (x - gridOrigin) * scale, y: rect.minY + (y - gridOrigin) * scale)
@@ -72,6 +98,6 @@ enum BrandMark {
 
         color.setStroke()
         frame.stroke()
-        letter.stroke()
+        if includeLetter { letter.stroke() }
     }
 }

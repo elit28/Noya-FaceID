@@ -58,4 +58,4 @@ NOYA Face protects selected apps behind your face (with Touch ID or your macOS p
 
 ## Licence — License
 
-Code sous licence [MIT](LICENSE). Composants tiers et crédits (HeyMac, Silent-Face-Anti-Spoofing, SFace d'OpenCV Zoo) : [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md). NOYA Face n'est pas affilié à Apple ; « Face ID » est une marque d'Apple Inc.
+Code sous licence [MIT](LICENSE). Composants tiers et crédits (HeyMac, Silent-Face-Anti-Spoofing, SFace d'OpenCV Zoo) : [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md). Le logo NOYA (le « N ») est une marque de NOYA 360 et n'est pas couvert par la licence MIT. NOYA Face n'est pas affilié à Apple ; « Face ID » est une marque d'Apple Inc.

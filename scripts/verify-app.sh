@@ -15,6 +15,7 @@ if echo "$ENTITLEMENTS_XML" | grep -q "disable-library-validation\|allow-dyld-en
 fi
 [ "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$APP/Contents/Info.plist")" = "fr.noya360.noyaface" ] || fail "identifiant inattendu"
 [ -d "$APP/Contents/Resources/NoyaFace_NoyaCore.bundle" ] || fail "ressources NoyaCore absentes"
+[ -f "$APP/Contents/Resources/BrandN.png" ] || fail "logo de la barre des menus absent"
 for LANG_CODE in fr en; do
     [ -f "$APP/Contents/Resources/$LANG_CODE.lproj/Localizable.strings" ] || fail "traduction $LANG_CODE absente"
     [ -f "$APP/Contents/Resources/$LANG_CODE.lproj/InfoPlist.strings" ] || fail "InfoPlist.strings $LANG_CODE absent"
