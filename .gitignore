@@ -60,3 +60,12 @@ fastlane/report.xml
 fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
+
+# NOYA Face
+.build/
+.swiftpm/
+dist/
+.DS_Store
+*.p12
+*.cer
+*.mobileprovision

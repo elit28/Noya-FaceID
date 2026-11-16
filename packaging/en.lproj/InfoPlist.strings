@@ -1,0 +1,5 @@
+/* App system strings (English). */
+"CFBundleName" = "NOYA Face";
+"CFBundleDisplayName" = "NOYA Face";
+"NSCameraUsageDescription" = "NOYA Face uses the camera to recognize your face. Images are analyzed on this Mac and are never stored or sent.";
+"NSHumanReadableCopyright" = "© 2026 NOYA Face — MIT License";
