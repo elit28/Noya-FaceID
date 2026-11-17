@@ -39,6 +39,15 @@ final class EnrollmentModel {
     /// Renseigné pour ajouter une apparence au visage existant au lieu de le remplacer.
     var appearanceName: String?
 
+    /// Note de qualité du dernier enregistrement réussi (mesures réelles).
+    struct ScanResult: Equatable {
+        let score: Int
+        let consistency: Float
+        let threshold: Float
+    }
+
+    private(set) var result: ScanResult?
+
     private var scans: [[FaceEmbedding]] = []
     private var runtime: NoyaRuntime?
     private var enroller: GuidedEnroller?
@@ -138,6 +147,8 @@ final class EnrollmentModel {
         phase = .saving
         let scans = self.scans
         let name = appearanceName
+        let threshold = AppModel.shared.settings.strictness.threshold
+        let consistency = ScanQuality.consistency(of: scans.flatMap { $0 })
         let outcome = await Task.detached(priority: .userInitiated) { () -> FailureReason? in
             do {
                 if let name {
@@ -152,12 +163,17 @@ final class EnrollmentModel {
                 return .saveFailed
             }
         }.value
+        if outcome == nil, let consistency {
+            result = ScanResult(score: ScanQuality.enrollmentScore(consistency: consistency, threshold: threshold),
+                                consistency: consistency, threshold: threshold)
+        }
         phase = outcome.map { .failed($0) } ?? .done
     }
 
     /// Recommence depuis le premier tour (après un échec).
     func restart() {
         scans = []
+        result = nil
         filled = [Bool](repeating: false, count: Self.sectorCount)
         direction = nil
         issue = nil

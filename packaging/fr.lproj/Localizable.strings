@@ -389,3 +389,17 @@
 "La mise à jour n’a pas passé les vérifications : rien n’a été modifié." = "La mise à jour n’a pas passé les vérifications : rien n’a été modifié.";
 "Impossible de remplacer l’app ici : placez NOYA Face dans le dossier Applications, ou téléchargez la mise à jour sur GitHub." = "Impossible de remplacer l’app ici : placez NOYA Face dans le dossier Applications, ou téléchargez la mise à jour sur GitHub.";
 "Mettre à jour" = "Mettre à jour";
+
+/* Note de qualité */
+"Qualité du scan : %lld/100" = "Qualité du scan : %lld/100";
+"Cohérence de vos empreintes : %@ (seuil %@)" = "Cohérence de vos empreintes : %@ (seuil %@)";
+"La note mesure la ressemblance de vos empreintes entre elles, comparée au seuil de reconnaissance : un indicateur de confort, pas de sécurité." = "La note mesure la ressemblance de vos empreintes entre elles, comparée au seuil de reconnaissance : un indicateur de confort, pas de sécurité.";
+"Pour une meilleure note : bonne lumière de face, pas de contre-jour, visage entier dans le cercle." = "Pour une meilleure note : bonne lumière de face, pas de contre-jour, visage entier dans le cercle.";
+"Refaire le scan" = "Refaire le scan";
+"Excellente" = "Excellente";
+"Bonne" = "Bonne";
+"Moyenne" = "Moyenne";
+"Faible" = "Faible";
+"Visage reconnu · qualité %lld/100" = "Visage reconnu · qualité %lld/100";
+"Visage non reconnu · qualité %lld/100" = "Visage non reconnu · qualité %lld/100";
+"Qualité %lld/100" = "Qualité %lld/100";

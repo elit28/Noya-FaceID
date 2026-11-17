@@ -1,5 +1,9 @@
 # Journal des versions — Changelog
 
+## 1.0.4 (novembre 2026)
+
+- Note de qualité du scan (0 à 100) : enregistrement du visage, test de la reconnaissance, apparences. Calcul testé (`ScanQuality`), à partir de mesures réelles uniquement.
+
 ## 1.0.3 (novembre 2026)
 
 - Mise à jour en un clic depuis l'app : téléchargement, vérification (empreinte SHA-256 publiée, identifiant, version, signature de code), remplacement et redémarrage. Vérifications testées.
