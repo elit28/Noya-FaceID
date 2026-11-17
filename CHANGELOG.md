@@ -1,5 +1,9 @@
 # Journal des versions — Changelog
 
+## 1.0.3 (novembre 2026)
+
+- Mise à jour en un clic depuis l'app : téléchargement, vérification (empreinte SHA-256 publiée, identifiant, version, signature de code), remplacement et redémarrage. Vérifications testées.
+
 ## 1.0.2 (novembre 2026)
 
 - Écran verrouillé : la reconnaissance se lance à chaque approche (souris, trackpad, touche, réveil de l'écran), avec 2 essais à chaque fois ; plus de déverrouillage immédiat quand on verrouille devant la caméra (testé).

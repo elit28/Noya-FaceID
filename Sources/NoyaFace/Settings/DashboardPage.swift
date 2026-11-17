@@ -24,11 +24,14 @@ struct DashboardPage: View {
 
     var body: some View {
         Form {
-            if case .available(let version, _) = updates.state {
+            if case .available(let version) = updates.state {
                 Section {
                     LabeledContent {
-                        Button("Voir") { updates.openDownloadPage() }
-                            .buttonStyle(.borderedProminent)
+                        HStack {
+                            Button("Nouveautés") { updates.openReleasePage() }
+                            Button("Mettre à jour") { Task { await updates.installUpdate() } }
+                                .buttonStyle(.borderedProminent)
+                        }
                     } label: {
                         Text("Mise à jour")
                         Text("La version \(version) de NOYA Face est disponible.")

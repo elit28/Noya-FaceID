@@ -332,7 +332,6 @@
 "Mises à jour" = "Mises à jour";
 "Rechercher les mises à jour automatiquement" = "Rechercher les mises à jour automatiquement";
 "Une fois par jour, NOYA Face interroge GitHub pour connaître la dernière version. Aucune autre donnée n’est envoyée. Désactivé par défaut." = "Une fois par jour, NOYA Face interroge GitHub pour connaître la dernière version. Aucune autre donnée n’est envoyée. Désactivé par défaut.";
-"Télécharger" = "Télécharger";
 "Rechercher maintenant" = "Rechercher maintenant";
 "Version installée : %@" = "Version installée : %@";
 "Désinstallation" = "Désinstallation";
@@ -342,8 +341,6 @@
 "Pas encore recherchée." = "Pas encore recherchée.";
 "NOYA Face est à jour." = "NOYA Face est à jour.";
 "La version %@ est disponible." = "La version %@ est disponible.";
-"Recherche impossible (pas de connexion ?)." = "Recherche impossible (pas de connexion ?).";
-"Voir" = "Voir";
 "Mise à jour" = "Mise à jour";
 "La version %@ de NOYA Face est disponible." = "La version %@ de NOYA Face est disponible.";
 "Votre visage (empreintes chiffrées)" = "Votre visage (empreintes chiffrées)";
@@ -383,3 +380,12 @@
 "Version %@" = "Version %@";
 "Armer le déverrouillage de l’écran…" = "Armer le déverrouillage de l’écran…";
 "Sur l’écran verrouillé, bougez la souris, touchez le trackpad ou appuyez sur Maj : la reconnaissance se lance, avec 2 essais à chaque fois." = "Sur l’écran verrouillé, bougez la souris, touchez le trackpad ou appuyez sur Maj : la reconnaissance se lance, avec 2 essais à chaque fois.";
+"Nouveautés" = "Nouveautés";
+"Mettre à jour maintenant" = "Mettre à jour maintenant";
+"Ouvrir sur GitHub" = "Ouvrir sur GitHub";
+"Téléchargement de la version %@…" = "Téléchargement de la version %@…";
+"Vérification et installation…" = "Vérification et installation…";
+"Recherche ou téléchargement impossible (pas de connexion ?)." = "Recherche ou téléchargement impossible (pas de connexion ?).";
+"La mise à jour n’a pas passé les vérifications : rien n’a été modifié." = "La mise à jour n’a pas passé les vérifications : rien n’a été modifié.";
+"Impossible de remplacer l’app ici : placez NOYA Face dans le dossier Applications, ou téléchargez la mise à jour sur GitHub." = "Impossible de remplacer l’app ici : placez NOYA Face dans le dossier Applications, ou téléchargez la mise à jour sur GitHub.";
+"Mettre à jour" = "Mettre à jour";
