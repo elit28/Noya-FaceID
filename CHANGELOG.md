@@ -1,5 +1,11 @@
 # Journal des versions — Changelog
 
+## 1.0.2 (novembre 2026)
+
+- Écran verrouillé : la reconnaissance se lance à chaque approche (souris, trackpad, touche, réveil de l'écran), avec 2 essais à chaque fois ; plus de déverrouillage immédiat quand on verrouille devant la caméra (testé).
+- Champ du mot de passe vidé avant la saisie automatique (testé).
+- Menu « Armer le déverrouillage de l'écran… » quand la saisie automatique est désarmée.
+
 ## 1.0.1 (novembre 2026)
 
 - Fenêtre d'installation (DMG) soignée : fond à la marque NOYA, icônes de 128 pt alignées sur une flèche « Glissez NOYA Face dans Applications », fenêtre sans barres, fond Retina. Construite par `scripts/build-dmg.sh` (dmgbuild, sans AppleScript).

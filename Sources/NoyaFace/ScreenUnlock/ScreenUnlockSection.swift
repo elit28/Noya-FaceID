@@ -16,6 +16,9 @@ struct ScreenUnlockSection: View {
                 Text("NOYA Face tape votre mot de passe macOS à votre place quand votre visage est reconnu. Désactivé par défaut.")
             }
             if enabled {
+                Text("Sur l’écran verrouillé, bougez la souris, touchez le trackpad ou appuyez sur Maj : la reconnaissance se lance, avec 2 essais à chaque fois.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
                 if controller.passwordRejected {
                     WarningNote(text: "Le mot de passe enregistré a été refusé par macOS (changé depuis ?). Saisissez-le de nouveau.")
                 }

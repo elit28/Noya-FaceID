@@ -381,3 +381,5 @@
 "Fenêtre" = "Window";
 "Placer dans le Dock" = "Minimize";
 "Version %@" = "Version %@";
+"Armer le déverrouillage de l’écran…" = "Arm Screen Unlock…";
+"Sur l’écran verrouillé, bougez la souris, touchez le trackpad ou appuyez sur Maj : la reconnaissance se lance, avec 2 essais à chaque fois." = "On the lock screen, move the mouse, touch the trackpad or press Shift: recognition starts, with 2 attempts each time.";

@@ -13,11 +13,13 @@ public struct LockScreenEnvironment {
     public var sleep: (TimeInterval) -> Void
     /// La saisie automatique a été armée par Touch ID ou le mot de passe (voir `UnlockArming`).
     public var isArmed: () -> Bool
+    /// Secondes depuis la dernière action au clavier, à la souris ou au trackpad (matériel).
+    public var secondsSinceInput: () -> TimeInterval
 
     public init(
         isLocked: @escaping () -> Bool?, displayIsAwake: @escaping () -> Bool, accessibilityTrusted: @escaping () -> Bool,
         loadPassword: @escaping () throws -> String, wakeDisplay: @escaping () -> Void, sleep: @escaping (TimeInterval) -> Void,
-        isArmed: @escaping () -> Bool = { true }
+        isArmed: @escaping () -> Bool = { true }, secondsSinceInput: @escaping () -> TimeInterval = { 0 }
     ) {
         self.isLocked = isLocked
         self.displayIsAwake = displayIsAwake
@@ -26,6 +28,7 @@ public struct LockScreenEnvironment {
         self.wakeDisplay = wakeDisplay
         self.sleep = sleep
         self.isArmed = isArmed
+        self.secondsSinceInput = secondsSinceInput
     }
 
     public static func live(store: SecureStore, isArmed: @escaping () -> Bool = { true }) -> LockScreenEnvironment {
@@ -46,7 +49,12 @@ public struct LockScreenEnvironment {
                 try? task.run()
             },
             sleep: { Thread.sleep(forTimeInterval: $0) },
-            isArmed: isArmed
+            isArmed: isArmed,
+            secondsSinceInput: {
+                // `kCGAnyInputEventType` (~0), au niveau matériel : fonctionne écran verrouillé.
+                guard let anyInput = CGEventType(rawValue: ~0) else { return 0 }
+                return CGEventSource.secondsSinceLastEventType(.hidSystemState, eventType: anyInput)
+            }
         )
     }
 }
@@ -61,6 +69,8 @@ public enum LockScreenTick: Equatable {
     case unlocked
     case passwordRejected
     case retriesExhausted
+    /// Écran verrouillé, en attente d'une approche (souris, trackpad, touche, réveil de l'écran).
+    case waitingForApproach
 }
 
 /// While the screen is locked and the display is on, looks for the enrolled face and
@@ -74,6 +84,10 @@ public final class LockScreenUnlocker: @unchecked Sendable {
     static let noMatchCooldown: TimeInterval = 3.5
     static let noFaceCooldown: TimeInterval = 1
     static let maxScansPerEpisode = 2
+    /// Inactivité minimale avant qu'une nouvelle action compte comme une approche.
+    static let quietBeforeApproach: TimeInterval = 3
+    /// Une action plus récente que ce délai déclenche la recherche.
+    static let approachInputWindow: TimeInterval = 1.5
 
     private let matcher: FaceMatching
     private let typist: PasswordTyping
@@ -86,11 +100,21 @@ public final class LockScreenUnlocker: @unchecked Sendable {
     private var attemptedThisEpisode = false
     private var scansThisEpisode = 0
     private var lastReportedProblem: String?
+    /// Avec `requiresApproach`, la caméra ne s'allume qu'après une approche : bouger la
+    /// souris, toucher le trackpad, appuyer sur une touche ou réveiller l'écran. Chaque
+    /// approche redonne `maxScansPerEpisode` essais. Sans cela, verrouiller devant la caméra
+    /// déverrouillerait aussitôt, et revenir plus tard ne relancerait aucune recherche.
+    private let requiresApproach: Bool
+    private var approached = false
+    private var quietSinceApproach = false
+    private var displaySlept = false
 
     public init(
         matcher: FaceMatching, typist: PasswordTyping, settings: EngineSettings,
-        environment: LockScreenEnvironment, onEvent: @escaping (EngineEvent) -> Void
+        environment: LockScreenEnvironment, requiresApproach: Bool = false,
+        onEvent: @escaping (EngineEvent) -> Void
     ) {
+        self.requiresApproach = requiresApproach
         self.matcher = matcher
         self.typist = typist
         self.settings = settings
@@ -128,12 +152,21 @@ public final class LockScreenUnlocker: @unchecked Sendable {
                 attemptedThisEpisode = false
                 scansThisEpisode = 0
                 lastReportedProblem = nil
+                approached = false
+                quietSinceApproach = false
+                displaySlept = false
             }
             return .notLocked
         }
         if stateLock.withLock({ attemptedThisEpisode }) { return .alreadyAttempted }
+        if requiresApproach, !detectApproach() { return .waitingForApproach }
         if stateLock.withLock({ scansThisEpisode }) >= Self.maxScansPerEpisode {
-            if !environment.displayIsAwake() { stateLock.withLock { scansThisEpisode = 0 } }
+            if requiresApproach {
+                // Essais épuisés : il faudra une nouvelle approche.
+                stateLock.withLock { approached = false }
+            } else if !environment.displayIsAwake() {
+                stateLock.withLock { scansThisEpisode = 0 }
+            }
             return .retriesExhausted
         }
         if case .refuse(let reason) = VerificationGate.lockScreen(settings, accessibilityTrusted: environment.accessibilityTrusted()) {
@@ -202,6 +235,26 @@ public final class LockScreenUnlocker: @unchecked Sendable {
         settings.lockScreenNeedsPassword = true
         onEvent(.lockScreenPasswordRejected)
         return .passwordRejected
+    }
+
+    /// Une approche : une action après au moins `quietBeforeApproach` secondes de calme, ou
+    /// l'écran qui se rallume. Elle redonne un crédit d'essais.
+    private func detectApproach() -> Bool {
+        let awake = environment.displayIsAwake()
+        let idle = environment.secondsSinceInput()
+        return stateLock.withLock { () -> Bool in
+            if !awake { displaySlept = true }
+            if idle >= Self.quietBeforeApproach { quietSinceApproach = true }
+            let woke = awake && displaySlept
+            let touched = quietSinceApproach && idle < Self.approachInputWindow
+            if woke || touched {
+                approached = true
+                scansThisEpisode = 0
+                displaySlept = false
+                quietSinceApproach = false
+            }
+            return approached
+        }
     }
 
     private var shouldKeepScanning: Bool {

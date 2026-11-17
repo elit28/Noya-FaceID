@@ -226,3 +226,76 @@ private struct ThrowingTypist: PasswordTyping {
     #expect(unlocker.tick() == .blocked("stored password unavailable (\(SecureStoreError.decryptionFailed))"))
     #expect(typist.typed.isEmpty)
 }
+
+// MARK: - Approche (souris, trackpad, touche, réveil de l'écran)
+
+private func makeApproachUnlocker(
+    system: FakeSystem, matcher: FakeMatcher, typist: PasswordTyping, recorder: EventRecorder
+) -> LockScreenUnlocker {
+    LockScreenUnlocker(
+        matcher: matcher, typist: typist, settings: makeTestSettings { $0.lockScreenEnabled = true },
+        environment: system.environment(), requiresApproach: true, onEvent: { recorder.record($0) }
+    )
+}
+
+@Test func lockingInFrontOfTheCameraDoesNotUnlockImmediately() {
+    let system = FakeSystem()
+    system.idle = 0.2 // ⌃⌘Q vient d'être pressé
+    let matcher = FakeMatcher()
+    matcher.outcome = matchedOutcome()
+    let typist = FakeTypist(system: system, unlocks: true)
+    let unlocker = makeApproachUnlocker(system: system, matcher: matcher, typist: typist, recorder: EventRecorder())
+
+    #expect(unlocker.tick() == .waitingForApproach)
+    #expect(matcher.callCount == 0)
+}
+
+@Test func touchingTheTrackpadAfterAQuietMomentStartsRecognition() {
+    let system = FakeSystem()
+    let matcher = FakeMatcher()
+    matcher.outcome = matchedOutcome()
+    let typist = FakeTypist(system: system, unlocks: true)
+    let unlocker = makeApproachUnlocker(system: system, matcher: matcher, typist: typist, recorder: EventRecorder())
+
+    system.idle = 40 // l'utilisateur est parti
+    #expect(unlocker.tick() == .waitingForApproach)
+    system.idle = 0.3 // il revient et touche le trackpad
+    #expect(unlocker.tick() == .unlocked)
+    #expect(typist.typed == ["hunter2"])
+}
+
+@Test func wakingTheDisplayStartsRecognition() {
+    let system = FakeSystem()
+    let matcher = FakeMatcher()
+    matcher.outcome = matchedOutcome()
+    let typist = FakeTypist(system: system, unlocks: true)
+    let unlocker = makeApproachUnlocker(system: system, matcher: matcher, typist: typist, recorder: EventRecorder())
+
+    system.displayAwake = false
+    #expect(unlocker.tick() == .waitingForApproach)
+    system.displayAwake = true
+    #expect(unlocker.tick() == .unlocked)
+}
+
+@Test func eachApproachGivesNewAttemptsAfterFailures() {
+    let system = FakeSystem()
+    let matcher = FakeMatcher() // personne devant la caméra
+    let typist = FakeTypist(system: system, unlocks: true)
+    let unlocker = makeApproachUnlocker(system: system, matcher: matcher, typist: typist, recorder: EventRecorder())
+
+    system.idle = 10
+    unlocker.tick()
+    system.idle = 0.1
+    #expect(unlocker.tick() == .noMatch)
+    #expect(unlocker.tick() == .noMatch)
+    #expect(unlocker.tick() == .retriesExhausted)
+    #expect(unlocker.tick() == .waitingForApproach)
+    #expect(matcher.callCount == LockScreenUnlocker.maxScansPerEpisode)
+
+    // Plus tard, l'utilisateur revient : nouveaux essais.
+    system.idle = 20
+    unlocker.tick()
+    system.idle = 0.5
+    matcher.outcome = matchedOutcome()
+    #expect(unlocker.tick() == .unlocked)
+}
