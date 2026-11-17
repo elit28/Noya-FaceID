@@ -24,8 +24,14 @@ struct FacePage: View {
                 } else if let profile {
                     ForEach(profile.appearances) { appearance in
                         LabeledContent {
-                            Text(appearance.createdAt, format: .dateTime.day().month().year())
-                                .foregroundStyle(.secondary)
+                            HStack(spacing: 10) {
+                                if let score = qualityScore(of: appearance) {
+                                    Text("Qualité \(score)/100")
+                                    StatusBadge(text: ScanQualityText.grade(score), positive: score >= 60)
+                                }
+                                Text(appearance.createdAt, format: .dateTime.day().month().year())
+                                    .foregroundStyle(.secondary)
+                            }
                         } label: {
                             Text(verbatim: appearance.name)
                         }
@@ -89,6 +95,11 @@ struct FacePage: View {
         } message: {
             Text("Action définitive. Les applications protégées demanderont Touch ID ou votre mot de passe.")
         }
+    }
+
+    private func qualityScore(of appearance: FaceAppearance) -> Int? {
+        guard let consistency = ScanQuality.consistency(of: appearance) else { return nil }
+        return ScanQuality.enrollmentScore(consistency: consistency, threshold: AppModel.shared.settings.strictness.threshold)
     }
 
     private var emptyText: LocalizedStringKey {

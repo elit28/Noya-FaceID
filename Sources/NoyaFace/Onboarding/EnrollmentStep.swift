@@ -50,6 +50,13 @@ struct EnrollmentStep: View {
         .onDisappear { model.cancel() }
     }
 
+    /// « Refaire le scan » remplace l'enregistrement ; pas pour un ajout d'apparence.
+    private var retryAction: (() -> Void)? {
+        guard model.appearanceName == nil else { return nil }
+        let model = self.model
+        return { model.restart() }
+    }
+
     private var isScanning: Bool {
         if case .scanning = model.phase { return true }
         return false
@@ -82,9 +89,15 @@ struct EnrollmentStep: View {
         case .saving:
             ProgressView().controlSize(.small)
         case .done:
-            Text("Aucune image n’a été conservée : seules des empreintes chiffrées.")
-                .font(.callout)
-                .foregroundStyle(.secondary)
+            VStack(spacing: 10) {
+                if let result = model.result {
+                    ScanQualityView(score: result.score, consistency: result.consistency, threshold: result.threshold,
+                                    onRetry: retryAction)
+                }
+                Text("Aucune image n’a été conservée : seules des empreintes chiffrées.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+            }
         case .failed:
             Button("Réessayer") { model.restart() }
                 .buttonStyle(.borderedProminent)

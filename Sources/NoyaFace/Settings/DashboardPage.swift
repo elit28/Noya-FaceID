@@ -1,3 +1,4 @@
+import NoyaCore
 import NoyaEngine
 import SwiftUI
 
@@ -17,8 +18,8 @@ struct DashboardPage: View {
     enum TestState: Equatable {
         case idle
         case running
-        case matched
-        case notMatched
+        case matched(score: Int)
+        case notMatched(score: Int?)
         case unavailable
     }
 
@@ -61,7 +62,7 @@ struct DashboardPage: View {
                     .disabled(test == .running || hasFace != true)
                     if let result = testResult {
                         Text(result)
-                            .foregroundStyle(test == .matched ? Color.green : Color.orange)
+                            .foregroundStyle(testMatched ? Color.green : Color.orange)
                     }
                 }
             }
@@ -149,11 +150,17 @@ struct DashboardPage: View {
         test == .running ? "Recherche…" : "Tester la reconnaissance"
     }
 
+    private var testMatched: Bool {
+        if case .matched = test { return true }
+        return false
+    }
+
     private var testResult: LocalizedStringKey? {
         switch test {
         case .idle, .running: return nil
-        case .matched: return "Visage reconnu"
-        case .notMatched: return "Visage non reconnu"
+        case .matched(let score): return "Visage reconnu · qualité \(score)/100"
+        case .notMatched(let score?): return "Visage non reconnu · qualité \(score)/100"
+        case .notMatched(nil): return "Visage non reconnu"
         case .unavailable: return "Reconnaissance indisponible"
         }
     }
@@ -183,17 +190,24 @@ struct DashboardPage: View {
         IslandController.shared.show(.searching)
         let settings = AppModel.shared.settings
         let matcher = runtime.verifier(interactive: true, strictness: settings.strictness, distance: settings.detectionDistance)
-        let result = await FaceVerifierAuthSource(matcher: matcher).authenticate(timeout: TimeInterval(settings.scanSeconds))
-        switch result {
-        case .matched:
-            test = .matched
+        let seconds = TimeInterval(settings.scanSeconds)
+        let outcome = await Task.detached(priority: .userInitiated) {
+            matcher.run(timeout: seconds, requiredConsecutive: 2, waitForTurn: 0.5, keepGoing: { true })
+        }.value
+        // Note calculée seulement si un visage a été analysé.
+        let score: Int? = outcome.framesEvaluated > 0
+            ? ScanQuality.verificationScore(similarity: outcome.bestSimilarity, threshold: settings.strictness.threshold,
+                                            liveness: outcome.bestLiveness, livenessThreshold: PipelineConfig().livenessThreshold)
+            : nil
+        if outcome.matched {
+            test = .matched(score: score ?? 0)
             IslandController.shared.flash(.success)
-        case .noMatch:
-            test = .notMatched
-            IslandController.shared.flash(.refused, seconds: 1.6)
-        case .unavailable:
+        } else if outcome.failure != nil {
             test = .unavailable
             IslandController.shared.hide()
+        } else {
+            test = .notMatched(score: score)
+            IslandController.shared.flash(.refused, seconds: 1.6)
         }
     }
 }
