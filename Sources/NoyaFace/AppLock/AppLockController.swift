@@ -40,6 +40,11 @@ final class AppLockController {
     /// Fermeture de session, redémarrage ou extinction : NOYA Face quitte sans demander.
     private var quitAuthorized = false
 
+    /// Mise à jour en un clic : l'app quitte puis la nouvelle version se relance aussitôt.
+    func allowQuitForUpdate() {
+        quitAuthorized = true
+    }
+
     /// Quitter NOYA Face retire la protection : tant qu'elle est active, Touch ID ou le mot de
     /// passe sont demandés. Pendant un épisode, il faut d'abord le terminer.
     func shouldTerminate(_ application: NSApplication) -> NSApplication.TerminateReply {

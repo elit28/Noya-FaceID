@@ -48,7 +48,7 @@ Protection des applications, verrouillage automatique et déverrouillage par le 
 
 Configuration requise : macOS 14 Sonoma ou plus récent, Mac Apple Silicon ou Intel, caméra intégrée ou externe.
 
-**Mettre à jour** : Réglages › Paramètres avancés › Mises à jour. **Désinstaller** : Réglages › Paramètres avancés › Désinstaller NOYA Face (supprime aussi votre visage, le mot de passe enregistré et la clé du trousseau).
+**Mettre à jour** : Réglages › Paramètres avancés › Mises à jour › **Mettre à jour maintenant** — l'app télécharge la nouvelle version, la vérifie (empreinte SHA-256, identité, signature) et redémarre toute seule. **Désinstaller** : Réglages › Paramètres avancés › Désinstaller NOYA Face (supprime aussi votre visage, le mot de passe enregistré et la clé du trousseau).
 
 ## Confidentialité et sécurité
 

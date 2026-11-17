@@ -332,7 +332,6 @@
 "Mises à jour" = "Updates";
 "Rechercher les mises à jour automatiquement" = "Check for updates automatically";
 "Une fois par jour, NOYA Face interroge GitHub pour connaître la dernière version. Aucune autre donnée n’est envoyée. Désactivé par défaut." = "Once a day, NOYA Face asks GitHub for the latest version. No other data is sent. Off by default.";
-"Télécharger" = "Download";
 "Rechercher maintenant" = "Check Now";
 "Version installée : %@" = "Installed version: %@";
 "Désinstallation" = "Uninstall";
@@ -342,8 +341,6 @@
 "Pas encore recherchée." = "Not checked yet.";
 "NOYA Face est à jour." = "NOYA Face is up to date.";
 "La version %@ est disponible." = "Version %@ is available.";
-"Recherche impossible (pas de connexion ?)." = "Couldn’t check (no connection?).";
-"Voir" = "View";
 "Mise à jour" = "Update";
 "La version %@ de NOYA Face est disponible." = "NOYA Face %@ is available.";
 "Votre visage (empreintes chiffrées)" = "Your face (encrypted signatures)";
@@ -383,3 +380,12 @@
 "Version %@" = "Version %@";
 "Armer le déverrouillage de l’écran…" = "Arm Screen Unlock…";
 "Sur l’écran verrouillé, bougez la souris, touchez le trackpad ou appuyez sur Maj : la reconnaissance se lance, avec 2 essais à chaque fois." = "On the lock screen, move the mouse, touch the trackpad or press Shift: recognition starts, with 2 attempts each time.";
+"Nouveautés" = "What’s New";
+"Mettre à jour maintenant" = "Update Now";
+"Ouvrir sur GitHub" = "Open on GitHub";
+"Téléchargement de la version %@…" = "Downloading version %@…";
+"Vérification et installation…" = "Verifying and installing…";
+"Recherche ou téléchargement impossible (pas de connexion ?)." = "Couldn’t check or download (no connection?).";
+"La mise à jour n’a pas passé les vérifications : rien n’a été modifié." = "The update failed verification: nothing was changed.";
+"Impossible de remplacer l’app ici : placez NOYA Face dans le dossier Applications, ou téléchargez la mise à jour sur GitHub." = "Can’t replace the app here: move NOYA Face to the Applications folder, or download the update from GitHub.";
+"Mettre à jour" = "Update";

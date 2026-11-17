@@ -41,11 +41,17 @@ struct AdvancedPage: View {
                 LabeledContent {
                     HStack {
                         if case .available = updates.state {
-                            Button("Télécharger") { updates.openDownloadPage() }
+                            Button("Nouveautés") { updates.openReleasePage() }
+                            Button("Mettre à jour maintenant") { Task { await updates.installUpdate() } }
                                 .buttonStyle(.borderedProminent)
+                        } else if case .failed = updates.state {
+                            Button("Ouvrir sur GitHub") { updates.openReleasePage() }
                         }
-                        Button("Rechercher maintenant") { Task { await updates.check() } }
-                            .disabled(updates.state == .checking)
+                        if updates.isBusy {
+                            ProgressView().controlSize(.small)
+                        } else {
+                            Button("Rechercher maintenant") { Task { await updates.check() } }
+                        }
                     }
                 } label: {
                     Text("Version installée : \(AppInfo.version)")
@@ -80,8 +86,12 @@ struct AdvancedPage: View {
         case .idle: return "Pas encore recherchée."
         case .checking: return "Recherche…"
         case .upToDate: return "NOYA Face est à jour."
-        case .available(let version, _): return "La version \(version) est disponible."
-        case .failed: return "Recherche impossible (pas de connexion ?)."
+        case .available(let version): return "La version \(version) est disponible."
+        case .downloading(let version): return "Téléchargement de la version \(version)…"
+        case .installing: return "Vérification et installation…"
+        case .failed(.network): return "Recherche ou téléchargement impossible (pas de connexion ?)."
+        case .failed(.verification): return "La mise à jour n’a pas passé les vérifications : rien n’a été modifié."
+        case .failed(.notWritable): return "Impossible de remplacer l’app ici : placez NOYA Face dans le dossier Applications, ou téléchargez la mise à jour sur GitHub."
         }
     }
 }
