@@ -9,14 +9,17 @@ public final class EngineController: @unchecked Sendable {
     private let lockScreenEnvironment: LockScreenEnvironment
     private let typist: PasswordTyping
     private let onEvent: (EngineEvent) -> Void
+    private let requiresApproach: Bool
     private let stateLock = NSLock()
     private var unlocker: LockScreenUnlocker?
 
     public init(
         settings: EngineSettings, log: AppLog = .shared,
         makeMatcher: @escaping () throws -> FaceMatching, lockScreenEnvironment: LockScreenEnvironment,
-        typist: PasswordTyping = KeystrokeInjector(), onEvent: @escaping (EngineEvent) -> Void
+        typist: PasswordTyping = KeystrokeInjector(), requiresApproach: Bool = false,
+        onEvent: @escaping (EngineEvent) -> Void
     ) {
+        self.requiresApproach = requiresApproach
         self.settings = settings
         self.log = log
         self.makeMatcher = makeMatcher
@@ -34,6 +37,7 @@ public final class EngineController: @unchecked Sendable {
             settings: settings, log: log,
             makeMatcher: { runtime.verifier(interactive: false, strictness: settings.strictness, distance: settings.detectionDistance) },
             lockScreenEnvironment: .live(store: runtime.backgroundStore, isArmed: isArmed),
+            requiresApproach: true,
             onEvent: onEvent
         )
     }
@@ -49,7 +53,8 @@ public final class EngineController: @unchecked Sendable {
         let matcher = try makeMatcher()
         let unlocker = LockScreenUnlocker(
             matcher: matcher, typist: typist, settings: settings,
-            environment: lockScreenEnvironment, onEvent: { [weak self] event in self?.record(event) }
+            environment: lockScreenEnvironment, requiresApproach: requiresApproach,
+            onEvent: { [weak self] event in self?.record(event) }
         )
         unlocker.start()
         stateLock.withLock { self.unlocker = unlocker }

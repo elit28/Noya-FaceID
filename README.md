@@ -64,6 +64,8 @@ Détails, limites et signalement de faille : [`SECURITY.md`](SECURITY.md).
 
 **Pourquoi « Ouvrir quand même » ?** Apple n'autorise l'ouverture directe que des apps notarisées, ce qui exige un compte Apple Developer payant. Le code est public : vous pouvez le vérifier ou le compiler vous-même.
 
+**Le déverrouillage ne se lance pas ?** Sur l'écran verrouillé, bougez la souris, touchez le trackpad ou appuyez sur Maj : la recherche démarre, avec 2 essais. Vérifiez aussi que la saisie automatique est armée (menu NOYA Face › « Armer le déverrouillage de l'écran… ») et que l'autorisation Accessibilité est accordée (Réglages › Diagnostic), car macOS peut la retirer après une mise à jour.
+
 **Le Mac se déverrouille-t-il après un redémarrage ?** Non : le mot de passe reste obligatoire après un redémarrage, pour FileVault et au changement d'utilisateur.
 
 **Pourquoi l'île n'apparaît-elle pas sur l'écran verrouillé ?** Il faudrait des API privées de macOS, que le projet refuse d'utiliser.

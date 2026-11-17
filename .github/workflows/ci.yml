@@ -43,7 +43,7 @@ jobs:
       - name: Construction de l’app universelle (signature ad hoc, Hardened Runtime)
         env:
           NOYA_UNIVERSAL: "1"
-        run: scripts/build-app.sh "1.0.1" "${{ github.run_number }}"
+        run: scripts/build-app.sh "1.0.2" "${{ github.run_number }}"
       - name: Archive de l’app
         run: ditto -c -k --keepParent "dist/NOYA Face.app" "dist/NOYA-Face-dev.zip"
       - name: Image disque (DMG), vérifiée comme pour une publication
